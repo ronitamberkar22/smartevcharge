@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartEVCharge — Booking Confirmed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root{--bg-primary:#0a0a0f;--bg-secondary:#111118;--bg-card:#16161f;--bg-card2:#1c1c28;--neon-green:#00f5a0;--neon-blue:#00d4ff;--neon-purple:#a855f7;--text-primary:#f0f0f5;--text-secondary:#9090a8;--text-muted:#5a5a72;--border:rgba(0,245,160,0.12);--sidebar-w:240px;--glow-green:0 0 20px rgba(0,245,160,0.3);--danger:#ff4d6d;}
+    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);}h1,h2,h3{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
+    .sidebar{width:var(--sidebar-w);background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .logo-txt{font-size:19px;color:var(--neon-green);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+    .logo-sub{font-size:9px;color:var(--text-muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+    .sidebar-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .user-name{font-size:13px;font-weight:600;}.user-role{font-size:10px;color:var(--neon-green);}
+    .nav{flex:1;padding:10px 0;overflow-y:auto;}.nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text-secondary);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
+    .nav-item:hover{color:var(--text-primary);background:rgba(0,245,160,0.06);}
+    .nav-item.active{color:var(--neon-green);background:rgba(0,245,160,0.1);border-left-color:var(--neon-green);}
+    .nav-item i{width:16px;text-align:center;font-size:13px;}
+    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
+    .btn-logout{width:100%;padding:9px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:var(--danger);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .main{margin-left:var(--sidebar-w);display:flex;flex-direction:column;min-height:100vh;flex:1;}
+    .topbar{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .topbar-left h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+    .topbar-left p{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+    .content{padding:32px 40px;width:100%;display:flex;justify-content:center;}
+    .content-inner{width:100%;max-width:760px;}
+    .confirm-hero{text-align:center;padding:40px 0 30px;}
+    @keyframes pop{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+    .confirm-icon{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 0 50px rgba(0,245,160,0.4);animation:pop .5s ease;}
+    .confirm-icon i{font-size:40px;color:#0a0a0f;}
+    .confirm-hero h2{font-size:28px;font-weight:700;margin-bottom:8px;}
+    .confirm-hero p{color:var(--text-secondary);}
+    .booking-id-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,245,160,0.1);border:1px solid var(--border);border-radius:10px;padding:8px 16px;margin-top:14px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--neon-green);}
+    .detail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:20px 0;}
+    .detail-item{background:var(--bg-secondary);border-radius:10px;padding:14px;}
+    .detail-item label{display:block;font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+    .detail-item p{font-size:14px;font-weight:500;}
+    .email-panel{background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(0,245,160,0.04));border:1px solid rgba(0,212,255,0.18);border-radius:14px;padding:20px;margin:20px 0;}
+    .form-group{margin-bottom:12px;}
+    .form-group label{display:block;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+    .form-control{width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-primary);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+    .form-control:focus{border-color:var(--neon-blue);}
+    .btn-email{width:100%;padding:12px;background:linear-gradient(135deg,var(--neon-blue),#0088bb);border:none;border-radius:10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+    .btn-email:hover{box-shadow:0 0 20px rgba(0,212,255,0.3);}
+    .btn-group{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;}
+    .btn-dl{padding:11px 22px;border-radius:10px;border:2px solid var(--neon-green);color:var(--neon-green);background:transparent;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;}
+    .btn-dl:hover{background:rgba(0,245,160,0.1);}
+    .btn-go{padding:11px 22px;border-radius:10px;background:linear-gradient(135deg,var(--neon-green),#00c896);border:none;color:#0a0a0f;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;}
+    .email-status{margin-top:10px;font-size:12px;text-align:center;display:none;padding:8px;border-radius:8px;}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card2);border:1px solid rgba(0,212,255,0.12);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
+    .toast.show{transform:translateX(0);}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;}
+  </style>
+</head>
+<body>
+<div style="display:flex;min-height:100vh;">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Charging Portal</div></div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <div><div class="user-name" id="user-name">User</div><div class="user-role">Ev user</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">Main</div>
+      <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+      <a class="nav-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+      <div class="nav-sec">Account</div>
+      <a class="nav-item" href="profile.html"><i class="fas fa-user"></i> Profile & History</a>
+    </nav>
+    <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar"><div class="topbar-left"><h3>Booking Confirmed</h3><p>Your EV charging slot is reserved!</p></div></div>
+    <div class="content"><div class="content-inner">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:28px;box-shadow:0 0 50px rgba(0,245,160,0.08);">
+        <!-- Hero -->
+        <div class="confirm-hero">
+          <div class="confirm-icon"><i class="fas fa-bolt"></i></div>
+          <h2>Booking Confirmed! <span style="color:var(--neon-green)">⚡</span></h2>
+          <p>Your EV charging slot is reserved. We'll see you there!</p>
+          <div class="booking-id-badge"><i class="fas fa-ticket"></i> <span id="booking-id">—</span></div>
+        </div>
+
+        <!-- Details -->
+        <div class="detail-grid">
+          <div class="detail-item"><label>Station</label><p id="conf-station">—</p></div>
+          <div class="detail-item"><label>Date</label><p id="conf-date">—</p></div>
+          <div class="detail-item"><label>Time Slot</label><p id="conf-slot">—</p></div>
+          <div class="detail-item"><label>Charger Type</label><p id="conf-charger">—</p></div>
+          <div class="detail-item"><label>Duration</label><p>1 Hour</p></div>
+          <div class="detail-item"><label>Amount Paid</label><p id="conf-amount" style="color:var(--neon-green);">—</p></div>
+          <div class="detail-item"><label>Payment Method</label><p id="conf-pay">—</p></div>
+          <div class="detail-item"><label>Status</label><p style="color:var(--neon-green);"><i class="fas fa-circle" style="font-size:8px;margin-right:4px;"></i>Confirmed</p></div>
+        </div>
+
+        <!-- Email Panel -->
+        <div class="email-panel">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div style="width:40px;height:40px;background:rgba(0,212,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-envelope" style="color:var(--neon-blue);font-size:16px;"></i></div>
+            <div><p style="font-size:14px;font-weight:600;">Send Booking Confirmation Email</p><p style="font-size:11px;color:var(--text-secondary);margin-top:2px;">A confirmation will be sent to your email</p></div>
+          </div>
+          <div class="form-group">
+            <label>Send To</label>
+            <input type="email" id="email-to" class="form-control" placeholder="your@email.com">
+          </div>
+          <button class="btn-email" id="email-btn" onclick="sendEmail()"><i class="fas fa-paper-plane"></i> Send Confirmation Email</button>
+          <div class="email-status" id="email-status"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-group">
+          <button class="btn-dl" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Download Receipt</button>
+          <a class="btn-go" href="dashboard.html"><i class="fas fa-th-large"></i> Go to Dashboard</a>
+          <a class="btn-go" href="booking.html" style="background:linear-gradient(135deg,var(--neon-blue),#0088bb);"><i class="fas fa-calendar-plus"></i> Book Another</a>
+        </div>
+      </div>
+    </div></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<script src="/shared/api.js"></script>
+<script>
+  if (!requireUserAuth()) throw new Error('Not authenticated');
+  const user = getUser();
+  document.getElementById('user-name').textContent = user.name || 'User';
+  document.getElementById('user-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href='login.html'; });
+
+  const ctx = JSON.parse(sessionStorage.getItem('confirmationData') || '{}');
+  if (!ctx.bookingId) { window.location.href = 'dashboard.html'; }
+
+  // Format booking ID
+  const shortId = ctx.bookingId ? 'VC-' + ctx.bookingId.slice(-8).toUpperCase() : '—';
+  document.getElementById('booking-id').textContent = shortId;
+  document.getElementById('conf-station').textContent = ctx.stationName || '—';
+  document.getElementById('conf-date').textContent = ctx.date || '—';
+  document.getElementById('conf-slot').textContent = ctx.slot || '—';
+  document.getElementById('conf-charger').textContent = ctx.charger || '—';
+  const paidAmount = ctx.amount || ctx.total || 0;
+  document.getElementById('conf-amount').textContent = '₹' + paidAmount;
+  document.getElementById('conf-pay').textContent = ctx.payMethod || '—';
+  document.getElementById('email-to').value = user.email || '';
+
+  async function sendEmail() {
+    const to = document.getElementById('email-to').value.trim();
+    if (!to) { showToast('Please enter a recipient email', 'warning'); return; }
+    const btn = document.getElementById('email-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Sending…';
+    const status = document.getElementById('email-status');
+
+    try {
+      await fetch('http://localhost:3000/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to, customerName: user.name || ctx.userName,
+          bookingId: shortId, station: ctx.stationName,
+          date: ctx.date, slot: ctx.slot, charger: ctx.charger,
+          amount: '₹' + (ctx.amount || ctx.total || 0), payMethod: ctx.payMethod
+        })
+      }).then(r => r.json()).then(d => {
+        if (d.success) {
+          status.style.display = 'block';
+          status.style.cssText = 'display:block;background:rgba(0,245,160,0.1);color:#00f5a0;';
+          status.textContent = '✓ Email sent successfully to ' + to;
+        } else throw new Error(d.error || 'Email failed');
+      });
+    } catch(e) {
+      status.style.cssText = 'display:block;background:rgba(255,77,109,0.1);color:#ff4d6d;';
+      status.textContent = e.message || 'Email failed — check server config';
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Confirmation Email';
+    }
+  }
+
+  function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    pdf.setFillColor(10, 10, 15); pdf.rect(0, 0, 210, 297, 'F');
+    pdf.setTextColor(0, 245, 160); pdf.setFontSize(22); pdf.setFont('helvetica','bold');
+    pdf.text('SMARTEVCHARGE', 105, 30, { align: 'center' });
+    pdf.setTextColor(144, 144, 168); pdf.setFontSize(10); pdf.setFont('helvetica','normal');
+    pdf.text('Booking Receipt', 105, 38, { align: 'center' });
+    pdf.setDrawColor(0, 245, 160); pdf.line(20, 44, 190, 44);
+    const rows = [
+      ['Booking ID', shortId], ['Station', ctx.stationName || '—'],
+      ['Date', ctx.date || '—'], ['Time Slot', ctx.slot || '—'],
+      ['Charger', ctx.charger || '—'], ['Duration', '1 Hour'],
+      ['Payment Method', ctx.payMethod || '—'], ['Amount Paid', '₹' + (ctx.amount || ctx.total || 0)], ['Status', 'CONFIRMED']
+    ];
+    let y = 58;
+    rows.forEach(([k, v]) => {
+      pdf.setTextColor(144, 144, 168); pdf.setFontSize(9); pdf.text(k, 25, y);
+      pdf.setTextColor(240, 240, 245); pdf.setFontSize(11); pdf.text(String(v), 100, y);
+      y += 14;
+    });
+    pdf.setDrawColor(0, 245, 160); pdf.line(20, y, 190, y);
+    pdf.setTextColor(0, 245, 160); pdf.setFontSize(9); pdf.text('© SmartEVCharge · Drive electric, drive green 🌿', 105, y + 12, { align: 'center' });
+    pdf.save(`SmartEVCharge-${shortId}.pdf`);
+    showToast('Receipt downloaded!', 'success');
+  }
+
+  // Clear session after load
+  sessionStorage.removeItem('bookingContext');
+</script>
+</body>
+</html>

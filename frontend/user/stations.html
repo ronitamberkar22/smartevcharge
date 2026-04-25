@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SmartEVCharge — Find Station</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{width:100vw;height:100vh;overflow:hidden;font-family:'Inter',sans-serif;background:#0d0d1a;color:#f0f0f5;}
+    h3,h4{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
+
+    /* ── Grid layout ──────────────────────── */
+    #page{display:grid;grid-template-columns:180px 1fr 360px;grid-template-rows:54px 1fr;width:100vw;height:100vh;}
+
+    /* Sidebar */
+    #sidebar{grid-column:1;grid-row:1/3;background:#0d0d1a;border-right:1px solid rgba(0,245,160,.1);display:flex;flex-direction:column;overflow:hidden;}
+    .sb-logo{padding:16px 14px 12px;border-bottom:1px solid rgba(0,245,160,.1);}
+    .sb-logo-txt{font-family:'Rajdhani',sans-serif;font-size:17px;color:#00f5a0;letter-spacing:2px;display:flex;align-items:center;gap:6px;}
+    .sb-logo-sub{font-size:8px;color:#5a5a72;letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+    .sb-user{padding:12px 14px;border-bottom:1px solid rgba(0,245,160,.1);display:flex;align-items:center;gap:9px;}
+    .sb-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#00f5a0,#00d4ff);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .sb-uname{font-size:12px;font-weight:600;}.sb-role{font-size:9px;color:#00f5a0;}
+    .sb-online{display:inline-block;width:7px;height:7px;border-radius:50%;background:#00f5a0;margin-right:4px;box-shadow:0 0 5px #00f5a0;}
+    .sb-nav{flex:1;padding:8px 0;overflow-y:auto;}
+    .sb-sec{padding:8px 14px 3px;font-size:8px;color:#5a5a72;letter-spacing:2px;text-transform:uppercase;}
+    .sb-item{display:flex;align-items:center;gap:9px;padding:9px 14px;color:#9090a8;font-size:12px;font-weight:500;transition:.15s;border-left:3px solid transparent;}
+    .sb-item:hover{color:#f0f0f5;background:rgba(0,245,160,.06);}
+    .sb-item.active{color:#00f5a0;background:rgba(0,245,160,.1);border-left-color:#00f5a0;}
+    .sb-item i{width:14px;text-align:center;font-size:12px;}
+    .sb-bot{padding:12px 14px;border-top:1px solid rgba(0,245,160,.1);}
+    .btn-logout{width:100%;padding:8px;background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.2);border-radius:7px;color:#ff4d6d;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .btn-logout:hover{background:rgba(255,77,109,.2);}
+
+    /* Topbar */
+    #topbar{grid-column:2/4;grid-row:1;background:#111118;border-bottom:1px solid rgba(0,245,160,.12);display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:12px;z-index:20;}
+    .tb-left{display:flex;align-items:center;gap:10px;}
+    .tb-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;display:flex;align-items:center;gap:7px;}
+    .tb-title i{color:#00f5a0;}
+    .tb-live{font-size:10px;color:#9090a8;}
+    .tb-live span{color:#00f5a0;}
+    .tb-badge{background:rgba(0,245,160,.1);border:1px solid rgba(0,245,160,.2);border-radius:10px;padding:3px 10px;font-size:11px;color:#00f5a0;display:flex;align-items:center;gap:5px;}
+
+    /* Map */
+    #map-container{grid-column:2;grid-row:2;position:relative;overflow:hidden;}
+    #leaflet-map{position:absolute;inset:0;width:100%;height:100%;}
+
+    /* Map overlays */
+    .search-area-btn{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:500;background:rgba(10,10,20,.92);border:1.5px solid #00f5a0;border-radius:20px;padding:7px 18px;color:#00f5a0;font-size:12px;font-weight:700;font-family:'Rajdhani',sans-serif;cursor:pointer;display:none;align-items:center;gap:7px;backdrop-filter:blur(8px);white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.4);}
+    .search-area-btn.show{display:flex;}
+    .map-fab{position:absolute;top:12px;right:12px;z-index:500;display:flex;flex-direction:column;gap:8px;}
+    .fab-btn{width:38px;height:38px;background:rgba(10,10,20,.9);border:1px solid rgba(0,245,160,.2);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9090a8;font-size:14px;transition:.2s;backdrop-filter:blur(6px);}
+    .fab-btn:hover,.fab-btn.on{border-color:#00f5a0;color:#00f5a0;background:rgba(0,245,160,.12);}
+    .map-legend{position:absolute;bottom:34px;left:12px;z-index:500;background:rgba(10,10,20,.88);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px 12px;display:flex;gap:12px;font-size:10px;color:#ccc;backdrop-filter:blur(6px);}
+    .leg-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+    .loc-bar{position:absolute;bottom:10px;left:12px;z-index:500;background:rgba(10,10,20,.88);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 12px;font-size:11px;color:#9090a8;display:flex;align-items:center;gap:6px;}
+    .loc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .loc-dot.g{background:#00f5a0;box-shadow:0 0 5px #00f5a0;}
+    .loc-dot.y{background:#ffd166;}.loc-dot.r{background:#ff4d6d;}
+
+    /* Station panel */
+    #station-panel{grid-column:3;grid-row:2;background:#111118;border-left:1px solid rgba(0,245,160,.1);display:flex;flex-direction:column;overflow:hidden;}
+    .panel-header{padding:12px 14px 0;flex-shrink:0;}
+    .panel-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .panel-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;}
+    .panel-count{font-size:11px;color:#9090a8;}
+    .panel-count b{color:#00f5a0;}
+    /* Sort tabs */
+    .sort-tabs{display:flex;gap:4px;margin-bottom:10px;}
+    .sort-tab{flex:1;padding:5px 4px;border-radius:7px;border:1px solid rgba(0,245,160,.12);background:transparent;color:#9090a8;font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;text-align:center;transition:.2s;}
+    .sort-tab.on{background:rgba(0,245,160,.1);border-color:#00f5a0;color:#00f5a0;font-weight:600;}
+    /* Source label */
+    .src-label{display:flex;align-items:center;gap:6px;font-size:11px;color:#00f5a0;font-weight:600;margin-bottom:8px;padding:5px 8px;background:rgba(0,245,160,.07);border:1px solid rgba(0,245,160,.2);border-radius:7px;}
+    .src-label i{font-size:11px;}
+    /* Search */
+    .search-wrap{position:relative;margin-bottom:8px;}
+    .search-wrap i{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#5a5a72;font-size:11px;}
+    .search-inp{width:100%;background:#16161f;border:1px solid rgba(0,245,160,.1);border-radius:8px;padding:7px 9px 7px 28px;color:#f0f0f5;font-size:12px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
+    .search-inp:focus{border-color:#00f5a0;}
+    .search-inp::placeholder{color:#5a5a72;}
+    /* All chip (single) */
+    .all-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 12px;border-radius:12px;background:#00f5a0;border:1px solid #00f5a0;color:#0a0a0f;font-size:10px;font-weight:700;margin-bottom:8px;}
+    /* Radius */
+    .radius-row{display:flex;align-items:center;gap:5px;font-size:10px;color:#9090a8;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05);}
+    .radius-sel{background:#16161f;border:1px solid rgba(0,245,160,.1);border-radius:5px;padding:2px 5px;color:#f0f0f5;font-size:10px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
+
+    /* Station list */
+    .panel-list{flex:1;overflow-y:auto;padding:8px 10px;}
+    .panel-list::-webkit-scrollbar{width:3px;}
+    .panel-list::-webkit-scrollbar-thumb{background:rgba(0,245,160,.15);border-radius:3px;}
+
+    /* Station cards — image 2 style */
+    .st-card{background:#16161f;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 12px;margin-bottom:7px;cursor:pointer;transition:.18s;border-left:3px solid transparent;}
+    .st-card:hover{border-color:rgba(0,245,160,.3);border-left-color:#00f5a0;background:#1a1a26;}
+    .st-card.sel{border-color:rgba(0,245,160,.4);border-left-color:#00f5a0;background:rgba(0,245,160,.04);}
+    .st-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;}
+    .st-dot-row{display:flex;align-items:flex-start;gap:8px;}
+    .st-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+    .st-status-dot.g{background:#00f5a0;box-shadow:0 0 4px #00f5a0;}
+    .st-status-dot.o{background:#ffd166;box-shadow:0 0 4px #ffd166;}
+    .st-status-dot.r{background:#ff4d6d;}
+    .st-name{font-size:12px;font-weight:600;line-height:1.3;margin-bottom:2px;}
+    .st-addr{font-size:10px;color:#9090a8;line-height:1.4;}
+    .st-price-tag{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#00f5a0;flex-shrink:0;white-space:nowrap;}
+    .st-price-tag span{font-size:9px;color:#9090a8;font-weight:400;}
+    .st-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:10px;}
+    .meta-item{color:#9090a8;display:flex;align-items:center;gap:3px;}
+    .meta-item.star{color:#ffd166;}
+    .meta-item.fast{color:#00d4ff;}
+    .meta-item.green{color:#00f5a0;}
+    .meta-item.red{color:#ff4d6d;}
+    .meta-sep{color:#333;font-size:8px;}
+    .st-actions{display:flex;gap:5px;margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,.04);}
+    .btn-detail{flex:1;padding:5px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);border-radius:6px;color:#00d4ff;font-size:10px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;text-align:center;text-decoration:none;display:block;transition:.2s;}
+    .btn-detail:hover{background:rgba(0,212,255,.16);}
+    .btn-book-s{flex:1;padding:5px;background:linear-gradient(135deg,#00f5a0,#00c896);border:none;border-radius:6px;color:#0a0a0f;font-size:10px;font-weight:700;cursor:pointer;font-family:'Rajdhani',sans-serif;text-align:center;text-decoration:none;display:block;transition:.2s;}
+    .btn-book-s:hover{box-shadow:0 0 10px rgba(0,245,160,.3);}
+
+    /* Empty */
+    .empty{text-align:center;padding:30px 12px;color:#5a5a72;}
+    .empty i{font-size:24px;margin-bottom:10px;display:block;opacity:.3;}
+    .empty p{font-size:12px;}.empty small{font-size:10px;display:block;margin-top:4px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin{animation:spin .9s linear infinite;display:inline-block;}
+
+    /* Toast */
+    .toast{position:fixed;bottom:18px;left:194px;background:#1c1c28;border:1px solid rgba(0,212,255,.18);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;z-index:9999;transform:translateY(70px);opacity:0;transition:.3s cubic-bezier(.34,1.56,.64,1);max-width:340px;}
+    .toast.show{transform:translateY(0);opacity:1;}
+
+    /* Leaflet overrides */
+    .leaflet-popup-content-wrapper{background:rgba(17,17,24,.97)!important;border:1px solid rgba(0,245,160,.2)!important;border-radius:10px!important;box-shadow:0 4px 24px rgba(0,0,0,.7)!important;}
+    .leaflet-popup-tip{background:rgba(17,17,24,.97)!important;}
+    .leaflet-popup-content{margin:12px 14px!important;font-family:'Inter',sans-serif!important;}
+    .leaflet-control-zoom a{background:rgba(17,17,24,.95)!important;color:#f0f0f5!important;border-color:rgba(0,245,160,.15)!important;}
+    .leaflet-control-zoom a:hover{background:rgba(0,245,160,.12)!important;color:#00f5a0!important;}
+  </style>
+</head>
+<body>
+<div id="page">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-logo"><div class="sb-logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="sb-logo-sub">Charging Portal</div></div>
+    <div class="sb-user">
+      <div class="sb-av" id="user-av">U</div>
+      <div><div class="sb-uname" id="user-name">User</div><div class="sb-role"><span class="sb-online"></span>Connected</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Main</div>
+      <a class="sb-item" href="dashboard.html"><i class="fas fa-th-large"></i> My Dashboard</a>
+      <a class="sb-item active" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+      <div class="sb-sec">Booking</div>
+      <a class="sb-item" href="station-detail.html"><i class="fas fa-info-circle"></i> Station Details</a>
+      <a class="sb-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+      <a class="sb-item" href="payment.html"><i class="fas fa-credit-card"></i> Payment</a>
+      <div class="sb-sec">Account</div>
+      <a class="sb-item" href="profile.html"><i class="fas fa-user"></i> Profile</a>
+    </nav>
+    <div class="sb-bot"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <div class="tb-left">
+      <div class="tb-title"><i class="fas fa-charging-station"></i> Find a Charging Station</div>
+      <div class="tb-live"><span id="live-status">Searching live EV stations near your location…</span> &nbsp;·&nbsp; Live data <span style="color:#00d4ff;">OpenChargeMap API</span></div>
+    </div>
+    <div class="tb-badge"><i class="fas fa-bolt"></i> <span id="cnt">—</span> stations found</div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map-container">
+    <div id="leaflet-map"></div>
+    <button class="search-area-btn" id="search-area-btn" onclick="searchThisArea()"><i class="fas fa-rotate"></i> Search This Area</button>
+    <div class="map-fab">
+      <div class="fab-btn on" id="loc-btn" title="My location" onclick="goToMyLocation()"><i class="fas fa-location-crosshairs"></i></div>
+      <div class="fab-btn" title="Reload stations" onclick="reloadStations()"><i class="fas fa-rotate"></i></div>
+    </div>
+    <div class="loc-bar">
+      <div class="loc-dot y" id="loc-dot"></div>
+      <span id="loc-txt">Getting location…</span>
+    </div>
+  </div>
+
+  <!-- STATION PANEL -->
+  <div id="station-panel">
+    <div class="panel-header">
+      <div class="panel-title-row">
+        <div class="panel-title">Nearby Stations</div>
+        <div class="panel-count"><b id="cnt2">—</b> found</div>
+      </div>
+      <div class="sort-tabs">
+        <button class="sort-tab on" onclick="setSort('nearest',this)">Nearest</button>
+        <button class="sort-tab" onclick="setSort('rated',this)">Top Rated</button>
+        <button class="sort-tab" onclick="setSort('avail',this)">Available</button>
+      </div>
+      <div class="src-label"><i class="fas fa-map"></i> Live (OpenStreetMap · Overpass API)</div>
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" class="search-inp" id="search-inp" placeholder="Search stations, area or pincode…" oninput="applyFilters()">
+      </div>
+      <div><span class="all-chip"><i class="fas fa-check"></i> All Stations</span></div>
+      <div class="radius-row" style="margin-top:6px;">
+        <i class="fas fa-circle-dot" style="color:#ff6b35;font-size:9px;"></i>
+        Search radius:
+        <select class="radius-sel" id="radius-sel" onchange="onRadiusChange()">
+          <option value="10">10 km</option>
+          <option value="20">20 km</option>
+          <option value="30">30 km</option>
+          <option value="50" selected>50 km</option>
+          <option value="100">100 km</option>
+        </select>
+      </div>
+    </div>
+    <div class="panel-list" id="panel-list">
+      <div class="empty"><i class="fas fa-satellite-dish spin"></i><p>Searching nearby stations…</p><small>Allow location access</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i id="toast-icon" class="fas fa-circle-info" style="color:#00d4ff;flex-shrink:0;"></i><span id="toast-msg"></span></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/shared/api.js"></script>
+<script>
+if (!requireUserAuth()) throw new Error('Not authenticated');
+const usr = getUser();
+document.getElementById('user-name').textContent = usr.name || 'User';
+document.getElementById('user-av').textContent = (usr.name||'U').charAt(0).toUpperCase();
+document.getElementById('logout-btn').onclick = ()=>{ localStorage.clear(); window.location.href='login.html'; };
+
+// State
+let map=null,userMark=null,userCircle=null,markersLayer=null;
+let ocmData=[],shown=[];
+let curSort='nearest';
+let userLat=null,userLng=null,searchLat=null,searchLng=null,suppressBtn=false;
+
+// Toast
+function toast(msg,type='info',dur=3500){
+  const el=document.getElementById('toast'),ic=document.getElementById('toast-icon');
+  document.getElementById('toast-msg').textContent=msg;
+  const c={success:'#00f5a0',error:'#ff4d6d',warn:'#ffd166',info:'#00d4ff'};
+  const k={success:'fa-circle-check',error:'fa-circle-xmark',warn:'fa-triangle-exclamation',info:'fa-circle-info'};
+  ic.className=`fas ${k[type]||k.info}`;ic.style.color=c[type]||c.info;
+  el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),dur);
+}
+
+// Helpers
+function hav(la1,ln1,la2,ln2){const R=6371,r=Math.PI/180,a=Math.sin((la2-la1)*r/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin((ln2-ln1)*r/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function getR(){return parseInt(document.getElementById('radius-sel').value);}
+
+// Simulated data (deterministic by station seed)
+function seededRand(seed){let h=2166136261;for(let i=0;i<seed.length;i++){h^=seed.charCodeAt(i);h=Math.imul(h,16777619);}return(h>>>0)/4294967295;}
+function simRating(id){return(3.5+seededRand(String(id))*1.4).toFixed(1);}
+function simPrice(kw,id){const b=kw>=100?55:kw>=22?45:kw>=7?38:30;return b+Math.floor(seededRand(String(id)+'p')*15);}
+function simWait(){const h=new Date().getHours();const peak=(h>=8&&h<=10)||(h>=17&&h<=21);return(peak?18:h>=12&&h<=14?12:6)+Math.floor(Math.random()*8);}
+function simSlots(total,id){const r=seededRand(String(id)+(Date.now()+'').slice(0,-5));const t=Math.max(total,2);return{avail:Math.floor(r*t),total:t};}
+
+// Map init
+function initMap(lat,lng){
+  if(map)return;
+  map=L.map('leaflet-map',{center:[lat,lng],zoom:13,zoomControl:true});
+  // Standard OpenStreetMap tiles — shows real street layout clearly
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors · EV data &copy; <a href="https://openchargemap.org">OpenChargeMap</a>',
+    maxZoom:19
+  }).addTo(map);
+  markersLayer=L.layerGroup().addTo(map);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>map.invalidateSize(true)));
+  setTimeout(()=>map.invalidateSize(true),300);
+  map.on('moveend',()=>{if(!suppressBtn)document.getElementById('search-area-btn').classList.add('show');});
+}
+
+function doMove(lat,lng,z){
+  suppressBtn=true;
+  document.getElementById('search-area-btn').classList.remove('show');
+  map.flyTo([lat,lng],z,{animate:true,duration:.8});
+  setTimeout(()=>suppressBtn=false,1500);
+}
+
+// GPS
+function setLoc(state,txt){
+  document.getElementById('loc-dot').className='loc-dot '+(state==='ok'?'g':state==='err'?'r':'y');
+  document.getElementById('loc-txt').textContent=txt;
+}
+function placeUser(lat,lng,acc){
+  const icon=L.divIcon({className:'',iconSize:[22,22],iconAnchor:[11,11],
+    html:`<div style="width:22px;height:22px;background:#0080ff;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 5px rgba(0,128,255,.25),0 0 12px rgba(0,128,255,.6);"></div>`});
+  if(userMark)try{map.removeLayer(userMark);}catch(e){}
+  if(userCircle)try{map.removeLayer(userCircle);}catch(e){}
+  userMark=L.marker([lat,lng],{icon,zIndexOffset:1000}).addTo(map);
+  if(acc<1000)userCircle=L.circle([lat,lng],{radius:acc,color:'#0080ff',fillColor:'#0080ff',fillOpacity:.06,weight:1,dashArray:'5'}).addTo(map);
+}
+
+function getGPS(){
+  if(!navigator.geolocation){setLoc('warn','No geolocation');startFallback();return;}
+  setLoc('warn','Getting location…');
+  navigator.geolocation.getCurrentPosition(pos=>{
+    userLat=pos.coords.latitude;userLng=pos.coords.longitude;
+    const acc=pos.coords.accuracy;
+    setLoc('ok',`Live · ±${Math.round(acc)}m`);
+    document.getElementById('live-status').textContent='Showing live EV stations near your location…';
+    initMap(userLat,userLng);
+    suppressBtn=true;map.setView([userLat,userLng],12,{animate:false});suppressBtn=false;
+    placeUser(userLat,userLng,acc);
+    searchLat=userLat;searchLng=userLng;
+    loadAllStations(userLat,userLng,getR());
+  },err=>{
+    setLoc('warn',({1:'Denied',2:'Unavailable',3:'Timeout'}[err.code]||'Error')+' · Mumbai default');
+    startFallback();
+  },{enableHighAccuracy:true,timeout:9000,maximumAge:60000});
+  navigator.geolocation.watchPosition(pos=>{
+    userLat=pos.coords.latitude;userLng=pos.coords.longitude;
+    if(map)placeUser(userLat,userLng,pos.coords.accuracy);
+    setLoc('ok',`Live · ±${Math.round(pos.coords.accuracy)}m`);
+  },null,{enableHighAccuracy:true,maximumAge:30000});
+}
+function startFallback(){const lat=19.076,lng=72.877;initMap(lat,lng);searchLat=lat;searchLng=lng;loadAllStations(lat,lng,getR());}
+function goToMyLocation(){if(userLat&&userLng&&map){doMove(userLat,userLng,13);toast('Centred on your location','success');}else getGPS();}
+function searchThisArea(){document.getElementById('search-area-btn').classList.remove('show');if(!map)return;const c=map.getCenter();searchLat=c.lat;searchLng=c.lng;loadAllStations(c.lat,c.lng,getR());}
+function reloadStations(){loadAllStations(searchLat||userLat||19.076,searchLng||userLng||72.877,getR());toast('Reloading…','info');}
+function onRadiusChange(){if(searchLat)loadAllStations(searchLat,searchLng,getR());}
+
+// ── Load stations: OSM only (accurate coordinates, no OCM bad data) ──────────
+async function loadAllStations(lat, lng, radius) {
+  document.getElementById('panel-list').innerHTML = `<div class="empty"><i class="fas fa-satellite-dish spin"></i><p>Loading stations within ${radius} km…</p></div>`;
+  document.getElementById('cnt').textContent = '…';
+  document.getElementById('cnt2').textContent = '…';
+  document.getElementById('live-status').textContent = 'Fetching live EV stations from OpenStreetMap…';
+
+  try {
+    const stations = await fetchOSM(lat, lng, radius);
+    ocmData = stations;
+    const total = stations.length;
+    document.getElementById('live-status').textContent = `${total} stations found within ${radius} km · Live data OpenStreetMap`;
+    document.getElementById('cnt').textContent = total;
+    document.getElementById('cnt2').textContent = total;
+    if (total === 0) {
+      document.getElementById('panel-list').innerHTML = '<div class="empty"><i class="fas fa-charging-station"></i><p>No stations found</p><small>Try increasing the radius or pan the map</small></div>';
+      toast('No stations in this area — try larger radius', 'warn');
+      return;
+    }
+    toast(`${total} real EV stations found`, 'success');
+    applyFilters();
+  } catch(err) {
+    console.error('[OSM]', err);
+    toast('Load failed: ' + err.message, 'error');
+    document.getElementById('panel-list').innerHTML = `<div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Failed to load</p><small>${esc(err.message)}</small></div>`;
+    document.getElementById('cnt').textContent = '0';
+    document.getElementById('cnt2').textContent = '0';
+  }
+}
+
+
+// OSM (Overpass) fetch — maps nodes to our station format
+async function fetchOSM(lat, lng, radius) {
+  const r = await fetch(`/api/osm/stations?lat=${lat}&lng=${lng}&distance=${radius}`);
+  if (!r.ok) throw new Error('OSM ' + r.status);
+  const elements = await r.json();
+  if (!Array.isArray(elements)) return [];
+  return elements.map(el => {
+    const t = el.tags || {};
+    const elat = el.lat || el.center?.lat;
+    const elng = el.lon || el.center?.lon;
+    if (!elat || !elng) return null;
+    const name = t.name || t.operator || t.brand || 'EV Charging Station';
+    const addr = [t['addr:street'], t['addr:suburb'] || t['addr:city']].filter(Boolean).join(', ');
+    const connectorTags = ['socket:type2','socket:ccs','socket:chademo','socket:type1','socket:schuko'];
+    const connectors = connectorTags.filter(k => t[k]).map(k => k.replace('socket:','').replace('type2','Type 2').replace('ccs','CCS').replace('chademo','CHAdeMO').replace('type1','Type 1'));
+    const capacity = parseInt(t.capacity) || parseInt(t['capacity:charging']) || 2;
+    const kw = parseFloat(t['socket:type2:output'] || t.maxpower || '0') || 0;
+    const hasFast = kw >= 22 || /rapid|fast|dc|ccs|chademo/i.test(JSON.stringify(t));
+    const dist = userLat ? hav(userLat, userLng, elat, elng) : null;
+    return {
+      id: 'osm-' + el.id, osm: true, ocm: false,
+      name, address: addr || t['addr:city'] || '',
+      lat: elat, lng: elng, connectors, maxKW: kw, hasFast,
+      numPoints: capacity, operational: true,
+      network: t.operator || t.brand || '',
+      distKm: dist, pricePerHour: null
+    };
+  }).filter(Boolean);
+}
+
+// OCM fetch
+async function fetchOCM(lat, lng, radius) {
+  const r = await fetch(`/api/ocm/stations?lat=${lat}&lng=${lng}&distance=${radius}&maxresults=200`);
+  if (!r.ok) throw new Error('OCM ' + r.status);
+  const data = await r.json();
+  if (!Array.isArray(data)) return [];
+  return data.map(poi => {
+    const info = poi.AddressInfo || {}, conns = poi.Connections || [];
+    const types = [...new Set(conns.map(c => c.ConnectionType?.Title || '').filter(Boolean))];
+    const maxKW = Math.max(0, ...conns.map(c => c.PowerKW || 0));
+    const dist = userLat ? hav(userLat, userLng, info.Latitude, info.Longitude) : null;
+    return {
+      id: 'ocm-' + poi.ID, ocm: true, osm: false,
+      name: info.Title || 'Charging Point',
+      address: [info.AddressLine1, info.Town, info.StateOrProvince].filter(Boolean).join(', '),
+      lat: info.Latitude, lng: info.Longitude, connectors: types,
+      maxKW, hasFast: maxKW >= 22,
+      numPoints: poi.NumberOfPoints || 2,
+      operational: poi.StatusType?.IsOperational !== false,
+      network: poi.OperatorInfo?.Title || '',
+      distKm: dist, pricePerHour: null
+    };
+  }).filter(s => s.lat && s.lng);
+}
+
+// Load DB
+async function loadDB(){
+  try{
+    const d=await apiCall('/stations');
+    dbData=(d.stations||[]).map(s=>({
+      id:s._id,_id:s._id,ocm:false,name:s.name,address:s.address||'',
+      lat:s.latitude,lng:s.longitude,connectors:s.connectorTypes||[],
+      hasFast:s.chargingSpeed!=='slow',maxKW:s.chargingSpeed==='super-fast'?150:s.chargingSpeed==='fast'?50:7.2,
+      numPoints:s.totalSlots||2,availableSlots:s.availableSlots??1,operational:true,
+      distKm:userLat?hav(userLat,userLng,s.latitude,s.longitude):null,pricePerHour:s.pricePerHour
+    })).filter(s=>s.lat&&s.lng);
+    if(curSrc==='db')applyFilters();
+  }catch(e){console.error('[DB]',e);}
+}
+
+// Filters / Sort
+function setSort(s,btn){curSort=s;document.querySelectorAll('.sort-tab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');applyFilters();}
+
+function applyFilters(){
+  const q=document.getElementById('search-inp').value.toLowerCase();
+  let out=ocmData.filter(s=>s.name.toLowerCase().includes(q)||(s.address||'').toLowerCase().includes(q));
+  if(curSort==='nearest') out.sort((a,b)=>(a.distKm??999)-(b.distKm??999));
+  else if(curSort==='rated') out.sort((a,b)=>parseFloat(simRating(b.id))-parseFloat(simRating(a.id)));
+  else if(curSort==='avail') out.sort((a,b)=>simSlots(b.numPoints,b.id).avail-simSlots(a.numPoints,a.id).avail);
+  shown=out;
+  document.getElementById('cnt').textContent=out.length;document.getElementById('cnt2').textContent=out.length;
+  renderList(out);plotMarkers(out);
+}
+
+function renderList(stations){
+  const el=document.getElementById('panel-list');
+  if(!stations.length){el.innerHTML='<div class="empty"><i class="fas fa-charging-station"></i><p>No stations found</p><small>Increase radius or change filter</small></div>';return;}
+  el.innerHTML=stations.map(s=>{
+    const rating=simRating(s.id);
+    const price=s.pricePerHour||simPrice(s.maxKW,s.id);
+    const wait=simWait();
+    const {avail,total}=simSlots(s.numPoints,s.id);
+    const type=s.hasFast?'⚡ Fast':s.maxKW>=7?'⚡ Standard':'🔌 Slow';
+    const dist=s.distKm!=null?s.distKm.toFixed(1)+' km':'';
+    const statusDot=s.operational?(avail>0?'g':'o'):'r';
+    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(s.id)}`:`id=${s._id}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${total}&wait=${wait}`;
+    const bookUrl=`booking.html?stationId=${s._id||''}&stationName=${encodeURIComponent(s.name)}`;
+    return `<div class="st-card" id="sc-${esc(s.id)}" onclick="pickStation('${esc(s.id)}',${s.lat},${s.lng})">
+      <div class="st-card-top">
+        <div class="st-dot-row">
+          <div class="st-status-dot ${statusDot}"></div>
+          <div>
+            <div class="st-name">${esc(s.name)}</div>
+            <div class="st-addr">${esc(s.address||'—')}</div>
+          </div>
+        </div>
+        <div class="st-price-tag">₹${price}<span>/hr</span></div>
+      </div>
+      <div class="st-meta">
+        <span class="meta-item star"><i class="fas fa-star"></i> ${rating}</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item fast">${type}</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item"><i class="fas fa-clock"></i> ~${wait} min</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item ${avail>0?'green':'red'}">${avail}/${total} slots</span>
+        ${dist?`<span class="meta-sep">·</span><span class="meta-item">${dist}</span>`:''}
+      </div>
+      <div class="st-actions">
+        <a href="${detailUrl}" class="btn-detail" onclick="event.stopPropagation()"><i class="fas fa-info-circle"></i> Details</a>
+        ${s.ocm?'':`<a href="${bookUrl}" class="btn-book-s" onclick="event.stopPropagation()"><i class="fas fa-calendar-plus"></i> Book</a>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function plotMarkers(stations){
+  if(!map||!markersLayer)return;
+  markersLayer.clearLayers();
+  if(!stations.length)return;
+  const bounds=[];
+  if(userLat&&userLng)bounds.push([userLat,userLng]);
+  stations.forEach(s=>{
+    const {avail}=simSlots(s.numPoints,s.id);
+    const c=avail>0?'#00c851':'#ff6b35'; // green=available, orange=full
+    const icon=L.divIcon({className:'',iconSize:[28,36],iconAnchor:[14,36],
+      html:`<div style="position:relative;width:28px;height:28px;background:linear-gradient(135deg,${c},${avail>0?'#009960':'#cc4400'});border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.4);">
+        <div style="transform:rotate(45deg);width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+          <i class="fas fa-bolt" style="color:#fff;font-size:11px;"></i>
+        </div>
+      </div>`
+    });
+    const rating=simRating(s.id);
+    const price=s.pricePerHour||simPrice(s.maxKW,s.id);
+    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(s.id)}`:`id=${s._id}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${s.numPoints}`;
+    const bookHtml=s.ocm?'':`<a href="booking.html?stationId=${s._id}&stationName=${encodeURIComponent(s.name)}" style="display:inline-block;padding:3px 8px;background:linear-gradient(135deg,#00f5a0,#00c896);border-radius:5px;color:#0a0a0f;font-size:10px;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;margin-left:4px;">Book</a>`;
+    const m=L.marker([s.lat,s.lng],{icon}).bindPopup(`
+      <div style="font-family:'Inter',sans-serif;min-width:200px;">
+        <div style="font-weight:700;font-size:13px;color:${c};margin-bottom:3px;">${esc(s.name)}</div>
+        <div style="font-size:10px;color:#888;margin-bottom:6px;">${esc(s.address||'')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;">
+          <span style="color:#ffd166;"><i class="fas fa-star"></i> ${rating}</span>
+          <span style="color:#00f5a0;">₹${price}/hr</span>
+          ${s.distKm!=null?`<span style="color:#ff6b35;"><i class="fas fa-location-dot"></i> ${s.distKm.toFixed(1)} km</span>`:''}
+        </div>
+        <div style="display:flex;gap:4px;">
+          <a href="${detailUrl}" style="display:inline-block;padding:3px 8px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:5px;color:#00d4ff;font-size:10px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;"><i class="fas fa-info-circle"></i> Details</a>
+          ${bookHtml}
+        </div>
+      </div>`,{maxWidth:260});
+    m.on('click',()=>highlightCard(s.id));
+    markersLayer.addLayer(m);
+    bounds.push([s.lat,s.lng]);
+  });
+  if(bounds.length>1){try{suppressBtn=true;map.fitBounds(L.latLngBounds(bounds),{padding:[40,40],maxZoom:14,animate:true});setTimeout(()=>suppressBtn=false,1800);}catch(e){}}
+}
+
+function pickStation(id,lat,lng){
+  highlightCard(id);
+  if(lat&&lng&&map){suppressBtn=true;document.getElementById('search-area-btn').classList.remove('show');map.flyTo([lat,lng],15,{animate:true,duration:.7});setTimeout(()=>suppressBtn=false,1200);}
+}
+function highlightCard(id){
+  document.querySelectorAll('.st-card').forEach(el=>el.classList.remove('sel'));
+  const el=document.getElementById('sc-'+id);
+  if(el){el.classList.add('sel');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+getGPS();
+</script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartEVCharge — Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --bg-primary:#0a0a0f;--bg-secondary:#111118;--bg-card:#16161f;--bg-card2:#1c1c28;
+      --neon-green:#00f5a0;--neon-blue:#00d4ff;--neon-purple:#a855f7;
+      --text-primary:#f0f0f5;--text-secondary:#9090a8;--text-muted:#5a5a72;
+      --border:rgba(0,245,160,0.12);--sidebar-w:240px;
+      --glow-green:0 0 20px rgba(0,245,160,0.3);--danger:#ff4d6d;--warning:#ffd166;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--bg-primary);color:var(--text-primary);}
+    h1,h2,h3{font-family:'Rajdhani',sans-serif;}
+    a{text-decoration:none;color:inherit;}
+
+    /* ── Layout ─────────────────────────────────────── */
+    #app{display:flex;min-height:100vh;}
+    .sidebar{
+      width:var(--sidebar-w);background:var(--bg-secondary);
+      border-right:1px solid var(--border);display:flex;flex-direction:column;
+      position:fixed;top:0;left:0;height:100vh;z-index:100;
+    }
+    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .logo-txt{font-size:19px;color:var(--neon-green);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+    .logo-sub{font-size:9px;color:var(--text-muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+    .sidebar-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .user-name{font-size:13px;font-weight:600;}
+    .user-role{font-size:10px;color:var(--neon-green);}
+    .nav{flex:1;padding:10px 0;overflow-y:auto;}
+    .nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text-secondary);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
+    .nav-item:hover{color:var(--text-primary);background:rgba(0,245,160,0.06);}
+    .nav-item.active{color:var(--neon-green);background:rgba(0,245,160,0.1);border-left-color:var(--neon-green);}
+    .nav-item i{width:16px;text-align:center;font-size:13px;}
+    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
+    .btn-logout{width:100%;padding:9px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:var(--danger);font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .btn-logout:hover{background:rgba(255,77,109,0.2);}
+
+    /* ── Main ───────────────────────────────────────── */
+    .main{
+      margin-left:var(--sidebar-w);
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .topbar{
+      background:var(--bg-secondary);border-bottom:1px solid var(--border);
+      padding:14px 28px;display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;z-index:50;
+    }
+    .topbar-left h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+    .topbar-left p{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+    .content{padding:24px 28px;flex:1;}
+
+    /* ── Tabs ───────────────────────────────────────── */
+    .tabs{
+      display:flex;gap:0;background:var(--bg-card);border:1px solid var(--border);
+      border-radius:10px;padding:4px;margin-bottom:24px;width:fit-content;
+    }
+    .tab{padding:8px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);transition:.2s;}
+    .tab:hover{color:var(--text-primary);}
+    .tab.active{background:var(--neon-green);color:#0a0a0f;}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+
+    /* ── Cards ──────────────────────────────────────── */
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:20px;}
+    .card-glow{box-shadow:0 0 30px rgba(0,245,160,0.06);}
+    .form-group{margin-bottom:18px;}
+    .form-group label{display:block;font-size:10px;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+    .form-control{width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text-primary);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
+    .form-control:focus{border-color:var(--neon-green);box-shadow:0 0 0 3px rgba(0,245,160,0.08);}
+    .form-control:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-primary{padding:10px 22px;background:linear-gradient(135deg,var(--neon-green),#00c896);border:none;border-radius:9px;color:#0a0a0f;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow-green);}
+
+    /* ── Profile Grid ───────────────────────────────── */
+    .profile-grid{
+      display:grid;
+      grid-template-columns:1fr 280px;
+      gap:24px;
+      align-items:start;
+    }
+    @media(max-width:860px){.profile-grid{grid-template-columns:1fr;}}
+
+    /* ── Avatar card ────────────────────────────────── */
+    .avatar-card{
+      background:var(--bg-card);border:1px solid var(--border);border-radius:14px;
+      padding:28px 22px;text-align:center;
+    }
+    .big-avatar{
+      width:90px;height:90px;border-radius:50%;
+      background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 16px;
+      font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:#0a0a0f;
+      box-shadow:0 0 30px rgba(0,245,160,0.25);
+    }
+    .avatar-name{font-size:22px;font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:4px;}
+    .avatar-email{font-size:12px;color:var(--text-secondary);}
+    .avatar-badge{
+      display:inline-block;margin-top:12px;font-size:11px;color:var(--neon-green);
+      padding:4px 14px;background:rgba(0,245,160,0.1);border:1px solid rgba(0,245,160,0.2);
+      border-radius:20px;
+    }
+    .avatar-divider{margin:16px 0;border:none;border-top:1px solid var(--border);}
+    .avatar-stat{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;}
+    .avatar-stat span:first-child{color:var(--text-secondary);}
+    .avatar-stat span:last-child{font-weight:600;color:var(--text-primary);}
+
+    /* ── Tables ─────────────────────────────────────── */
+    .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px;}
+    .tbl th{text-align:left;padding:11px 14px;color:var(--text-muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--bg-card2);border-bottom:1px solid var(--border);white-space:nowrap;}
+    .tbl td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+    .tbl tr:last-child td{border-bottom:none;}
+    .tbl tr:hover td{background:rgba(0,245,160,.04);}
+
+    /* ── Pills ──────────────────────────────────────── */
+    .pill{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;}
+    .pill.success{background:rgba(0,245,160,0.15);color:var(--neon-green);}
+    .pill.info{background:rgba(0,212,255,0.15);color:var(--neon-blue);}
+    .pill.warning{background:rgba(255,209,102,0.15);color:var(--warning);}
+    .pill.danger{background:rgba(255,77,109,0.15);color:var(--danger);}
+    .pill.purple{background:rgba(168,85,247,0.15);color:var(--neon-purple);}
+
+    /* ── Empty state ─────────────────────────────────── */
+    .empty{text-align:center;padding:40px;color:var(--text-muted);}
+    .empty i{font-size:30px;margin-bottom:10px;display:block;opacity:.4;}
+
+    /* ── Toast ──────────────────────────────────────── */
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card2);border:1px solid rgba(0,212,255,0.12);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
+    .toast.show{transform:translateX(0);}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#0a0a0f;border-radius:50%;animation:spin .8s linear infinite;}
+  </style>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div>
+      <div class="logo-sub">Charging Portal</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <div>
+        <div class="user-name" id="user-name">User</div>
+        <div class="user-role">EV user</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">Main</div>
+      <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+      <a class="nav-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+      <div class="nav-sec">Account</div>
+      <a class="nav-item active" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
+      <div class="nav-sec">More</div>
+      <a class="nav-item" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h3>My Profile</h3>
+        <p>Account settings &amp; booking history</p>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('profile',this)">Profile</div>
+        <div class="tab" onclick="switchTab('bookings',this)">Bookings</div>
+        <div class="tab" onclick="switchTab('payments',this)">Payments</div>
+        <div class="tab" onclick="switchTab('password',this)">Password</div>
+      </div>
+
+      <!-- ── Profile Tab ───────────────────────────── -->
+      <div class="tab-content active" id="tab-profile">
+        <div class="profile-grid">
+
+          <!-- Left: form -->
+          <div class="card card-glow">
+            <h3 style="font-size:17px;margin-bottom:20px;">Personal Information</h3>
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" class="form-control" id="prof-name">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" class="form-control" id="prof-email" disabled>
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" class="form-control" id="prof-phone" placeholder="+91 98765 43210">
+            </div>
+            <button class="btn-primary" onclick="updateProfile()">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+          </div>
+
+          <!-- Right: avatar card -->
+          <div class="avatar-card">
+            <div class="big-avatar" id="big-avatar">U</div>
+            <div class="avatar-name" id="prof-display-name">User</div>
+            <div class="avatar-email" id="prof-display-email">—</div>
+            <div class="avatar-badge"><i class="fas fa-bolt" style="font-size:9px;"></i> EV Member</div>
+            <hr class="avatar-divider">
+            <div class="avatar-stat">
+              <span>Member Since</span>
+              <span id="member-since">—</span>
+            </div>
+            <div class="avatar-stat">
+              <span>Total Bookings</span>
+              <span id="total-bookings">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Bookings Tab ──────────────────────────── -->
+      <div class="tab-content" id="tab-bookings">
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Station</th>
+                <th>Date &amp; Time</th>
+                <th>Duration</th>
+                <th>Charger</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-body">
+              <tr><td colspan="7"><div class="empty">Loading…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Payments Tab ──────────────────────────── -->
+      <div class="tab-content" id="tab-payments">
+        <div class="table-wrap">
+          <table class="tbl">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Station</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="payments-body">
+              <tr><td colspan="6"><div class="empty">Loading…</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Password Tab ──────────────────────────── -->
+      <div class="tab-content" id="tab-password">
+        <div class="card" style="max-width:440px;">
+          <h3 style="font-size:17px;margin-bottom:20px;">Change Password</h3>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" id="curr-pass" placeholder="Current password">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" id="new-pass" placeholder="Min. 8 characters">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" class="form-control" id="conf-pass" placeholder="Repeat new password">
+          </div>
+          <button class="btn-primary" onclick="changePassword()">
+            <i class="fas fa-lock"></i> Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<script src="/shared/api.js"></script>
+<script>
+  if (!requireUserAuth()) throw new Error('Not authenticated');
+  const user = getUser();
+
+  // ── User-scoped booking key ──────────────────────────────────────────
+  // Use MongoDB _id if available, fall back to email as unique identifier
+  const userId = user._id || user.id || user.email || 'guest';
+  function getUserBookingsKey() { return `localBookings_${userId}`; }
+
+  // ── CRITICAL: Clear any stale confirmationData from previous user ────
+  // If the confirmationData in sessionStorage belongs to a different user, discard it.
+  (function cleanStaleSession() {
+    try {
+      const conf = JSON.parse(sessionStorage.getItem('confirmationData') || 'null');
+      if (conf && conf.userId && conf.userId !== userId) {
+        // Data from a different logged-in user — remove it
+        sessionStorage.removeItem('confirmationData');
+      }
+    } catch(e) { sessionStorage.removeItem('confirmationData'); }
+  })();
+
+  // ── Populate sidebar & profile header ───────────────────────────────
+  document.getElementById('user-name').textContent         = user.name || 'User';
+  document.getElementById('user-avatar').textContent       = (user.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('big-avatar').textContent        = (user.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('prof-display-name').textContent = user.name || '—';
+  document.getElementById('prof-display-email').textContent = user.email || '—';
+  document.getElementById('prof-name').value   = user.name  || '';
+  document.getElementById('prof-email').value  = user.email || '';
+  document.getElementById('prof-phone').value  = user.phone || '';
+
+  // Member since (from user object or localStorage token creation time)
+  const memberSince = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString('en-IN', {month:'short', year:'numeric'})
+    : 'Active';
+  document.getElementById('member-since').textContent = memberSince;
+
+  // ── Logout: also clear session storage ──────────────────────────────
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    sessionStorage.removeItem('confirmationData');
+    sessionStorage.removeItem('bookingContext');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'login.html';
+  });
+
+  function switchTab(id, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+    if (id === 'bookings') loadBookings();
+    if (id === 'payments') loadPayments();
+  }
+
+  async function updateProfile() {
+    const name  = document.getElementById('prof-name').value.trim();
+    const phone = document.getElementById('prof-phone').value.trim();
+    try {
+      const data = await apiCall('/auth/profile', { method: 'PUT', body: JSON.stringify({ name, phone }) });
+      localStorage.setItem('user', JSON.stringify(data.user || { ...user, name, phone }));
+      showToast('Profile updated!', 'success');
+      document.getElementById('user-name').textContent         = name;
+      document.getElementById('big-avatar').textContent        = name.charAt(0).toUpperCase();
+      document.getElementById('prof-display-name').textContent = name;
+    } catch(e) { showToast(e.message, 'error'); }
+  }
+
+  async function changePassword() {
+    const curr = document.getElementById('curr-pass').value;
+    const nw   = document.getElementById('new-pass').value;
+    const conf = document.getElementById('conf-pass').value;
+    if (!curr || !nw || !conf) { showToast('Fill in all fields', 'warning'); return; }
+    if (nw !== conf)           { showToast('Passwords do not match', 'warning'); return; }
+    if (nw.length < 8)         { showToast('Password must be at least 8 chars', 'warning'); return; }
+    try {
+      await apiCall('/auth/password', { method: 'PUT', body: JSON.stringify({ currentPassword: curr, newPassword: nw }) });
+      showToast('Password changed!', 'success');
+      ['curr-pass','new-pass','conf-pass'].forEach(id => document.getElementById(id).value = '');
+    } catch(e) { showToast(e.message, 'error'); }
+  }
+
+  async function cancelBooking(id) {
+    if (!confirm('Cancel this booking?')) return;
+    try {
+      await apiCall(`/bookings/${id}/cancel`, { method: 'PUT' });
+      showToast('Booking cancelled', 'success');
+      loadBookings();
+    } catch(e) { showToast(e.message, 'error'); }
+  }
+
+  // ── User-scoped local bookings helper ───────────────────────────────
+  function getLocalBookings() {
+    const stored = JSON.parse(localStorage.getItem(getUserBookingsKey()) || '[]');
+    // Only merge confirmationData if it belongs to THIS user
+    const conf = JSON.parse(sessionStorage.getItem('confirmationData') || 'null');
+    if (conf && conf.bookingId) {
+      const confUserId = conf.userId || null;
+      // Only add if it either has no userId tag (legacy), or matches current user
+      if (!confUserId || confUserId === userId) {
+        if (!stored.some(b => b.bookingId === conf.bookingId)) {
+          stored.push({ ...conf, userId }); // tag with current userId
+          localStorage.setItem(getUserBookingsKey(), JSON.stringify(stored));
+        }
+      }
+    }
+    return stored;
+  }
+
+  function pillHtml(s = 'completed') {
+    const m = { completed:'success', in_progress:'info', pending:'warning', cancelled:'danger' };
+    const cls = m[s.replace('-','_')] || 'success';
+    return `<span class="pill ${cls}">${s}</span>`;
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  }
+
+  function fmtDateTime(d) {
+    if (!d) return '—';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) + ' ' +
+           dt.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+  }
+
+  async function loadBookings() {
+    const tbody = document.getElementById('bookings-body');
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty">Loading…</div></td></tr>';
+
+    // Local (OSM / pre-DB) bookings — scoped to this user
+    const local = getLocalBookings();
+    const localRows = local.map(b => ({
+      _source:     'local',
+      station:     { name: b.stationName || 'EV Station' },
+      startTime:   b.date ? new Date(b.date + 'T' + (b.slot||'10:00') + ':00').toISOString() : null,
+      duration:    b.duration || 1,
+      chargerType: b.charger  || '—',
+      totalAmount: b.amount   || 0,
+      status:      'completed',
+      _id:         b.bookingId,
+    }));
+
+    // DB bookings (authenticated, already user-filtered by backend)
+    let dbRows = [];
+    try {
+      const data = await apiCall('/bookings/my');
+      dbRows = data.bookings || [];
+    } catch(e) {}
+
+    const all = [...localRows, ...dbRows].reverse();
+
+    // Update avatar card total
+    document.getElementById('total-bookings').textContent = all.length || '0';
+
+    if (!all.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings yet. Book your first charge!</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = all.map(b => `
+      <tr>
+        <td>${b.station?.name || 'Station'}</td>
+        <td>${fmtDateTime(b.startTime)}</td>
+        <td>${b.duration || 1}h</td>
+        <td>${b.chargerType || '—'}</td>
+        <td style="color:var(--neon-green)">₹${b.totalAmount || 0}</td>
+        <td>${pillHtml(b.status || 'completed')}</td>
+        <td>${(b._source !== 'local' && b.status === 'pending')
+          ? `<button onclick="cancelBooking('${b._id}')" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,77,109,.4);background:rgba(255,77,109,.1);color:var(--danger);font-size:11px;cursor:pointer;">Cancel</button>`
+          : '—'}</td>
+      </tr>`).join('');
+  }
+
+  async function loadPayments() {
+    const tbody = document.getElementById('payments-body');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty">Loading…</div></td></tr>';
+
+    const local = getLocalBookings();
+    const localPayRows = local.map(b => ({
+      _source:       'local',
+      transactionId: b.txnId || ('BK' + b.bookingId),
+      createdAt:     b.date ? new Date(b.date).toISOString() : new Date().toISOString(),
+      stationName:   b.stationName || 'EV Station',
+      amount:        b.amount || 0,
+      paymentMethod: b.payMethod || 'UPI',
+      status:        'completed',
+    }));
+
+    let dbPay = [];
+    try {
+      const data = await apiCall('/payments/my');
+      dbPay = data.payments || [];
+    } catch(e) {}
+
+    const all = [...localPayRows, ...dbPay].reverse();
+
+    if (!all.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-receipt"></i>No payments yet</div></td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = all.map(p => `
+      <tr>
+        <td style="font-family:monospace;color:var(--neon-green);font-size:12px;">${p.transactionId || '—'}</td>
+        <td>${fmtDate(p.createdAt)}</td>
+        <td>${p._source === 'local' ? (p.stationName || '—') : (p.booking?.station?.name || '—')}</td>
+        <td style="color:var(--neon-green)">₹${p.amount}</td>
+        <td>${p.paymentMethod || '—'}</td>
+        <td>${pillHtml(p.status || 'completed')}</td>
+      </tr>`).join('');
+  }
+</script>
+</body>
+</html>

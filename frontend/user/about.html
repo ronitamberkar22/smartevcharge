@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>SmartEVCharge — About Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#0a0a0f;--bg2:#111118;--card:#16161f;--card2:#1c1c28;--green:#00f5a0;--blue:#00d4ff;--purple:#a855f7;--orange:#ff6b35;--text:#f0f0f5;--text2:#9090a8;--muted:#5a5a72;--border:rgba(0,245,160,0.12);--sw:240px;--red:#ff4d6d;--yellow:#ffd166;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
+
+    /* Sidebar */
+    .sidebar{width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .logo-txt{font-size:19px;color:var(--green);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+    .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+    .sb-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .u-name{font-size:13px;font-weight:600;}.u-role{font-size:10px;color:var(--green);}
+    .nav{flex:1;padding:10px 0;overflow-y:auto;}
+    .nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
+    .nav-item:hover{color:var(--text);background:rgba(0,245,160,0.06);}
+    .nav-item.active{color:var(--green);background:rgba(0,245,160,0.1);border-left-color:var(--green);}
+    .nav-item i{width:16px;text-align:center;font-size:13px;}
+    .sb-bot{padding:14px 18px;border-top:1px solid var(--border);}
+    .btn-logout{width:100%;padding:9px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+
+    /* Main */
+    .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .topbar h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+    .topbar p{font-size:11px;color:var(--text2);margin-top:2px;}
+    .content{padding:24px 28px;max-width:900px;}
+
+    /* Hero banner */
+    .hero-banner{background:linear-gradient(135deg,#0f1f18,#0a1628);border:1px solid rgba(0,245,160,.18);border-radius:16px;padding:28px;margin-bottom:22px;position:relative;overflow:hidden;}
+    .hero-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(0,245,160,.08),transparent 70%);border-radius:50%;}
+    .hero-tagline{font-size:11px;color:var(--green);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+    .hero-title{font-size:28px;font-weight:700;margin-bottom:14px;line-height:1.2;}
+    .hero-title span{color:var(--green);}
+    .hero-body{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:start;}
+    .hero-desc{font-size:14px;color:var(--text2);line-height:1.7;max-width:560px;}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-width:180px;}
+    .stat-box{background:rgba(0,0,0,.3);border-radius:10px;padding:14px;text-align:center;}
+    .stat-num{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1;}
+    .stat-num.green{color:var(--green);}
+    .stat-num.blue{color:var(--blue);}
+    .stat-num.purple{color:var(--purple);}
+    .stat-num.yellow{color:var(--yellow);}
+    .stat-lbl{font-size:10px;color:var(--muted);margin-top:4px;}
+
+    /* Reviews */
+    .sec-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+    .sec-title i{color:var(--green);}
+    .avg-badge{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+    .avg-stars{color:var(--yellow);letter-spacing:2px;}
+
+    .reviews-list{margin-bottom:22px;}
+    .review-card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-bottom:12px;transition:.2s;}
+    .review-card:hover{border-color:rgba(0,245,160,.15);}
+    .rev-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+    .rev-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .rev-name{font-size:13px;font-weight:600;}
+    .rev-date{font-size:10px;color:var(--muted);}
+    .rev-stars{color:var(--yellow);font-size:13px;letter-spacing:1px;margin-left:auto;}
+    .rev-text{font-size:13px;color:var(--text2);line-height:1.6;}
+    .empty-rev{text-align:center;padding:36px;color:var(--muted);}
+    .empty-rev i{font-size:28px;display:block;margin-bottom:10px;opacity:.4;}
+
+    /* Write review */
+    .write-card{background:var(--card);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px;margin-bottom:22px;}
+    .write-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+    .write-sub{font-size:12px;color:var(--text2);margin-bottom:16px;}
+    .star-row{display:flex;gap:6px;margin-bottom:14px;cursor:pointer;}
+    .star-btn{font-size:26px;color:var(--muted);transition:.15s;line-height:1;}
+    .star-btn.lit{color:var(--yellow);}
+    .star-btn:hover{transform:scale(1.15);}
+    .form-control{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;resize:vertical;min-height:100px;transition:.2s;}
+    .form-control:focus{border-color:var(--green);}
+    .btn-submit{margin-top:12px;padding:11px 24px;background:linear-gradient(135deg,var(--green),#00c896);border:none;border-radius:10px;color:#0a0a0f;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s;}
+    .btn-submit:hover{box-shadow:0 0 20px rgba(0,245,160,.3);transform:translateY(-1px);}
+
+    /* Toast */
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid rgba(0,212,255,0.18);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(160%);opacity:0;transition:.35s cubic-bezier(.34,1.56,.64,1);}
+    .toast.show{transform:translateX(0);opacity:1;}
+  </style>
+</head>
+<body>
+<div style="display:flex;min-height:100vh;">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sb-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Charging Portal</div></div>
+    <div class="sb-user">
+      <div class="av" id="user-av">U</div>
+      <div><div class="u-name" id="user-name">User</div><div class="u-role">EV user</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">Main</div>
+      <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+      <a class="nav-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+      <div class="nav-sec">Account</div>
+      <a class="nav-item" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
+      <div class="nav-sec">More</div>
+      <a class="nav-item active" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
+    </nav>
+    <div class="sb-bot"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div><h3>About <span style="color:var(--green)">SmartEVCharge</span></h3><p>Powering India's Electric Vehicle Revolution</p></div>
+    </div>
+
+    <div class="content">
+
+      <!-- Mission Banner -->
+      <div class="hero-banner">
+        <div class="hero-tagline"><i class="fas fa-leaf"></i> &nbsp;Our Mission</div>
+        <div class="hero-body">
+          <div>
+            <div class="hero-desc">
+              SmartEVCharge is India's most advanced AI-powered EV charging management platform.
+              We're on a mission to <strong style="color:var(--green)">eliminate range anxiety</strong> and make electric vehicle
+              charging as seamless as booking an Uber. Our platform connects drivers with
+              10,000+ charging stations across 50 cities.
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box"><div class="stat-num green">10K+</div><div class="stat-lbl">Stations</div></div>
+            <div class="stat-box"><div class="stat-num blue">50+</div><div class="stat-lbl">Cities</div></div>
+            <div class="stat-box"><div class="stat-num purple">2M+</div><div class="stat-lbl">Sessions</div></div>
+            <div class="stat-box"><div class="stat-num yellow">4.8★</div><div class="stat-lbl">Rating</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Reviews -->
+      <div class="sec-title">
+        <span><i class="fas fa-star" style="color:var(--yellow);margin-right:6px;"></i>User Reviews</span>
+        <div class="avg-badge"><span class="avg-stars" id="avg-stars">★★★★★</span><span id="avg-text">— (0 reviews)</span></div>
+      </div>
+      <div class="reviews-list" id="reviews-list">
+        <div class="empty-rev"><i class="fas fa-star"></i>No reviews yet — be the first to share your experience!</div>
+      </div>
+
+      <!-- Write a Review -->
+      <div class="write-card">
+        <div class="write-title">Write a Review</div>
+        <div class="write-sub">Share your SmartEVCharge experience</div>
+        <!-- Star selector -->
+        <div class="star-row" id="star-row">
+          <span class="star-btn" data-v="1">★</span>
+          <span class="star-btn" data-v="2">★</span>
+          <span class="star-btn" data-v="3">★</span>
+          <span class="star-btn" data-v="4">★</span>
+          <span class="star-btn" data-v="5">★</span>
+        </div>
+        <textarea class="form-control" id="rev-text" placeholder="Tell us about your experience…"></textarea>
+        <button class="btn-submit" onclick="submitReview()"><i class="fas fa-paper-plane"></i> Submit Review</button>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i id="toast-icon" class="fas fa-circle-check" style="color:var(--green);flex-shrink:0;"></i><span id="toast-msg"></span></div>
+
+<script src="/shared/api.js"></script>
+<script>
+  if (!requireUserAuth()) throw new Error('auth');
+  const usr = getUser();
+  document.getElementById('user-name').textContent = usr.name || 'User';
+  document.getElementById('user-av').textContent = (usr.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('logout-btn').onclick = () => { localStorage.clear(); window.location.href = 'login.html'; };
+
+  // ── Reviews stored in localStorage (shared across all users on this browser) ──
+  const STORE_KEY = 'smartev_reviews';
+
+  function getReviews() { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
+  function saveReviews(r) { localStorage.setItem(STORE_KEY, JSON.stringify(r)); }
+
+  // ── Star selector ──
+  let selectedStars = 0;
+  const starBtns = document.querySelectorAll('.star-btn');
+  starBtns.forEach(btn => {
+    btn.addEventListener('mouseover', () => highlightStars(+btn.dataset.v));
+    btn.addEventListener('mouseleave', () => highlightStars(selectedStars));
+    btn.addEventListener('click', () => { selectedStars = +btn.dataset.v; highlightStars(selectedStars); });
+  });
+  function highlightStars(n) {
+    starBtns.forEach(b => b.classList.toggle('lit', +b.dataset.v <= n));
+  }
+
+  // ── Render reviews ──
+  function renderReviews() {
+    const reviews = getReviews();
+    const list = document.getElementById('reviews-list');
+    const avgEl = document.getElementById('avg-stars');
+    const avgTxt = document.getElementById('avg-text');
+
+    if (!reviews.length) {
+      list.innerHTML = '<div class="empty-rev"><i class="fas fa-star"></i>No reviews yet — be the first to share your experience!</div>';
+      avgEl.textContent = '★★★★★';
+      avgTxt.textContent = '— (0 reviews)';
+      return;
+    }
+
+    const avg = (reviews.reduce((s, r) => s + r.stars, 0) / reviews.length).toFixed(1);
+    const filled = Math.round(parseFloat(avg));
+    avgEl.textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
+    avgTxt.textContent = `${avg} (${reviews.length} review${reviews.length > 1 ? 's' : ''})`;
+
+    list.innerHTML = [...reviews].reverse().map(r => {
+      const initials = (r.author || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+      const starsHtml = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+      const dateStr = new Date(r.ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      return `<div class="review-card">
+        <div class="rev-header">
+          <div class="rev-av">${initials}</div>
+          <div>
+            <div class="rev-name">${r.author || 'Anonymous'}</div>
+            <div class="rev-date">${dateStr}</div>
+          </div>
+          <div class="rev-stars">${starsHtml}</div>
+        </div>
+        <div class="rev-text">${r.text}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── Submit review ──
+  function submitReview() {
+    const text = document.getElementById('rev-text').value.trim();
+    if (!selectedStars) { showToast('Please select a star rating', 'warning'); return; }
+    if (!text) { showToast('Please write your review', 'warning'); return; }
+
+    const reviews = getReviews();
+    reviews.push({
+      id: Date.now(),
+      author: usr.name || 'Anonymous',
+      stars: selectedStars,
+      text,
+      ts: new Date().toISOString(),
+    });
+    saveReviews(reviews);
+    renderReviews();
+
+    // Reset form
+    document.getElementById('rev-text').value = '';
+    selectedStars = 0;
+    highlightStars(0);
+    showToast('Review submitted! Thank you 🎉', 'success');
+  }
+
+  function showToast(msg, type = 'info') {
+    const el = document.getElementById('toast');
+    const ic = document.getElementById('toast-icon');
+    document.getElementById('toast-msg').textContent = msg;
+    const c = { success: '#00f5a0', error: '#ff4d6d', warning: '#ffd166', info: '#00d4ff' };
+    const k = { success: 'fa-circle-check', error: 'fa-circle-xmark', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+    ic.className = `fas ${k[type] || k.info}`; ic.style.color = c[type] || c.info;
+    el.classList.add('show'); clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  renderReviews();
+</script>
+</body>
+</html>

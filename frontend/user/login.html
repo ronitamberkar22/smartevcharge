@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartEVCharge — Sign In</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --neon-green: #00f5a0;
+      --neon-blue: #00d4ff;
+      --neon-purple: #a855f7;
+      --text-primary: #f0f0f5;
+      --text-secondary: #9090a8;
+      --text-muted: #5a5a72;
+      --border: rgba(0, 245, 160, 0.14);
+      --glow-green: 0 0 24px rgba(0, 245, 160, 0.3);
+      --danger: #ff4d6d;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .auth-bg {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #0a0a1a 0%, #0d1525 40%, #0a1a12 100%);
+      z-index: 0;
+    }
+
+    .auth-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(0, 245, 160, 0.06) 0%, transparent 60%);
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      opacity: .3;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1)
+      }
+
+      50% {
+        transform: translateY(-20px) scale(1.5)
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(0, 245, 160, .2)
+      }
+
+      50% {
+        box-shadow: 0 0 40px rgba(0, 245, 160, .5)
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .auth-card {
+      position: relative;
+      z-index: 2;
+      width: 440px;
+      max-width: 96vw;
+      background: rgba(22, 22, 31, 0.88);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(0, 245, 160, 0.22);
+      border-radius: 22px;
+      padding: 44px 40px 36px;
+      box-shadow: 0 0 80px rgba(0, 245, 160, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      animation: fadeUp .4s ease;
+    }
+
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+      border-radius: 22px 22px 0 0;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 68px;
+      height: 68px;
+      background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      box-shadow: var(--glow-green);
+      animation: glow 3s infinite;
+    }
+
+    .logo-icon i {
+      font-size: 28px;
+      color: #0a0a0f;
+    }
+
+    .auth-logo h1 {
+      font-size: 26px;
+      color: var(--neon-green);
+      letter-spacing: 2px;
+    }
+
+    .auth-logo p {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 3px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: .2s;
+    }
+
+    .auth-tab.active {
+      background: var(--neon-green);
+      color: #0a0a0f;
+    }
+
+    .auth-form {
+      display: none;
+      animation: fadeUp .3s ease;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(0, 245, 160, 0.18);
+      border-radius: 10px;
+      padding: 12px 14px 12px 40px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: .2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 0 3px rgba(0, 245, 160, 0.1);
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--neon-green), #00c4a0);
+      border: none;
+      border-radius: 11px;
+      color: #0a0a0f;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--glow-green);
+    }
+
+    .btn-submit:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+      border-top-color: #0a0a0f;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    .alert {
+      display: none;
+      border-radius: 10px;
+      padding: 11px 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert.show {
+      display: flex;
+    }
+
+    .alert.error {
+      background: rgba(255, 77, 109, 0.1);
+      border: 1px solid rgba(255, 77, 109, 0.3);
+      color: var(--danger);
+    }
+
+    .alert.success {
+      background: rgba(0, 245, 160, 0.1);
+      border: 1px solid rgba(0, 245, 160, 0.3);
+      color: var(--neon-green);
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .auth-footer a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--neon-purple);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 12px;
+      text-decoration: none;
+      transition: .2s;
+      letter-spacing: .5px;
+    }
+
+    .auth-footer a:hover {
+      background: rgba(168, 85, 247, 0.1);
+    }
+  </style>
+</head>
+
+<script>
+  function isValidEmail(email) {
+  return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$/.test(email);
+}
+</script>
+
+<body>
+  <div class="auth-bg"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+      <h1>SMARTEVCHARGE</h1>
+      <p>Smart EV Charging Network</p>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">Sign In</div>
+      <div class="auth-tab" onclick="switchTab('register')">Register</div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form active" id="login-form">
+      <div class="alert error" id="login-error"><i class="fas fa-circle-exclamation"></i><span
+          id="login-error-text"></span></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-wrap"><i class="fas fa-envelope"></i>
+           <input type="email" class="form-control" id="login-email" placeholder="you@example.com"
+            pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
+            title="Email must contain @ and end with .com"
+             autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap"><i class="fas fa-lock"></i>
+          <input type="password" class="form-control" id="login-pass" placeholder="••••••••"
+            autocomplete="current-password">
+        </div>
+      </div>
+      <button class="btn-submit" id="login-btn" onclick="doLogin()">
+        <i class="fas fa-bolt"></i> SIGN IN
+      </button>
+    </div>
+
+    <!-- Register Form -->
+    <div class="auth-form" id="register-form">
+      <div class="alert error" id="reg-error"><i class="fas fa-circle-exclamation"></i><span id="reg-error-text"></span>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <div class="input-wrap"><i class="fas fa-user"></i>
+          <input type="text" class="form-control" id="reg-name" placeholder="Raj Shah">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-wrap"><i class="fas fa-envelope"></i>
+          <input type="email" class="form-control" id="reg-email" placeholder="you@example.com"
+          pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
+          title="Email must contain @ and end with .com"
+          autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Phone (optional)</label>
+        <div class="input-wrap"><i class="fas fa-phone"></i>
+          <input type="tel" class="form-control" id="reg-phone" placeholder="+91 98765 43210">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap"><i class="fas fa-lock"></i>
+          <input type="password" class="form-control" id="reg-pass" placeholder="Min. 8 characters">
+        </div>
+      </div>
+      <button class="btn-submit" id="reg-btn" onclick="doRegister()">
+        <i class="fas fa-plug"></i> CREATE ACCOUNT
+      </button>
+      <div class="alert success" id="reg-success"><i class="fas fa-circle-check"></i><span>Account created! Please sign
+          in.</span></div>
+    </div>
+
+    <div class="auth-footer">
+      <a href="../admin/login.html"><i class="fas fa-shield-halved"></i> Admin Portal</a>
+    </div>
+  </div>
+
+  <script src="/shared/api.js"></script>
+  <script>
+    // Particles
+    (function () {
+      const c = document.getElementById('particles');
+      for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div'); p.className = 'particle';
+        p.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 5}s;animation-duration:${4 + Math.random() * 4}s;opacity:${Math.random() * 0.4 + 0.1};`;
+        c.appendChild(p);
+      }
+    })();
+
+    // Redirect if already logged in
+    if (localStorage.getItem('token')) window.location.href = 'dashboard.html';
+
+    function switchTab(tab) {
+      document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', i === (tab === 'login' ? 0 : 1)));
+      document.getElementById('login-form').classList.toggle('active', tab === 'login');
+      document.getElementById('register-form').classList.toggle('active', tab === 'register');
+      clearAlerts();
+    }
+
+    function clearAlerts() {
+      ['login-error', 'reg-error', 'reg-success'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('show'); });
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id); const tx = document.getElementById(id + '-text');
+      if (tx) tx.textContent = msg; if (el) el.classList.add('show');
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-pass').value;
+      if (!email || !password) { 
+        showError('login-error', 'Please fill in all fields.'); 
+        return; 
+      }
+
+     if (!isValidEmail(email)) {
+       showError('login-error', 'Enter valid email with @ and .com');
+       return;
+      }
+
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Signing in…';
+      clearAlerts();
+
+      try {
+        const data = await apiCall('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.href = "/dashboard";
+      } catch (err) {
+        showError('login-error', err.message || 'Invalid credentials');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-bolt"></i> SIGN IN';
+      }
+    }
+
+    async function doRegister() {
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const password = document.getElementById('reg-pass').value;
+
+      if (!name || !email || !password) { 
+  showError('reg-error', 'Please fill in all required fields.'); 
+  return; 
+}
+
+if (!isValidEmail(email)) { showError('reg-error', 'Enter valid email with @ and .com'); return; }
+      if (password.length < 6) { showError('reg-error', 'Password must be at least 6 characters.'); return; }
+
+      const btn = document.getElementById('reg-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Creating account…';
+      clearAlerts();
+
+      try {
+        await apiCall('/auth/register', {
+          method: 'POST',
+          body: JSON.stringify({ name, email, phone, password })
+        });
+        document.getElementById('reg-success').classList.add('show');
+        document.getElementById('reg-name').value = '';
+        document.getElementById('reg-email').value = '';
+        document.getElementById('reg-phone').value = '';
+        document.getElementById('reg-pass').value = '';
+        document.getElementById('login-email').value = email;
+        setTimeout(() => switchTab('login'), 1800);
+      } catch (err) {
+        showError('reg-error', err.message || 'Registration failed');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-plug"></i> CREATE ACCOUNT';
+      }
+    }
+
+    // Enter key support
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        if (document.getElementById('login-form').classList.contains('active')) doLogin();
+        else doRegister();
+      }
+    });
+  </script>
+</body>
+
+</html>

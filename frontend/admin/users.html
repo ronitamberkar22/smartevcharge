@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartEVCharge Admin — Users</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{--bg:#09090f;--bg2:#10101a;--card:#15151f;--card2:#1a1a28;--accent:#a855f7;--accent2:#7c3aed;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--text:#f1f0f7;--text2:#9090b0;--muted:#5a5a72;--border:rgba(168,85,247,0.14);--border2:rgba(168,85,247,0.25);--sidebar:240px;--glow:0 0 24px rgba(168,85,247,0.25);}
+    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);}h1,h2,h3{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
+    .sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .logo-txt{font-size:19px;color:var(--accent);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+    .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+    .sidebar-admin{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .admin-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+    .admin-name{font-size:13px;font-weight:600;}.admin-role{font-size:10px;color:var(--accent);display:flex;align-items:center;gap:4px;}
+    .admin-role::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+    .nav{flex:1;padding:10px 0;overflow-y:auto;}.nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
+    .nav-item:hover{color:var(--text);background:rgba(168,85,247,0.06);}
+    .nav-item.active{color:var(--accent);background:rgba(168,85,247,0.1);border-left-color:var(--accent);}
+    .nav-item i{width:16px;text-align:center;font-size:13px;}
+    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
+    .btn-logout{width:100%;padding:9px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .btn-logout:hover{background:rgba(239,68,68,0.2);}
+    .main{margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .topbar-left h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
+    .topbar-left p{font-size:11px;color:var(--text2);margin-top:2px;}
+    .content{padding:24px 28px;}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+    .search-input{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;width:240px;}
+    .search-input:focus{border-color:var(--accent);}
+    .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:700px;}
+    .tbl th{text-align:left;padding:11px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--card2);border-bottom:1px solid var(--border);white-space:nowrap;}
+    .tbl td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
+    .tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:rgba(168,85,247,0.04);}
+    .pill{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;}
+    .pill.active{background:rgba(16,185,129,0.15);color:var(--green);}
+    .pill.inactive{background:rgba(239,68,68,0.15);color:var(--red);}
+    .act-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid;display:inline-flex;align-items:center;gap:3px;margin-right:4px;}
+    .act-btn.toggle-on{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);}
+    .act-btn.toggle-off{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);}
+    .user-init{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-right:8px;vertical-align:middle;}
+    .empty{text-align:center;padding:40px;color:var(--muted);}
+    .empty i{font-size:30px;margin-bottom:10px;display:block;opacity:.4;}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
+    .toast.show{transform:translateX(0);}
+  </style>
+</head>
+<body>
+<div style="display:flex;min-height:100vh;">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Admin Panel</div></div>
+    <div class="sidebar-admin">
+      <div class="admin-avatar" id="admin-avatar">A</div>
+      <div><div class="admin-name" id="admin-name">Admin</div><div class="admin-role">Administrator</div></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-sec">Overview</div>
+      <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a class="nav-item" href="bookings.html"><i class="fas fa-calendar-alt"></i> Bookings</a>
+      <div class="nav-sec">Management</div>
+      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Stations</a>
+      <a class="nav-item active" href="users.html"><i class="fas fa-users"></i> Users</a>
+      <a class="nav-item" href="revenue.html"><i class="fas fa-chart-line"></i> Revenue</a>
+      <div class="nav-sec">System</div>
+      <a class="nav-item" href="reports.html"><i class="fas fa-file-export"></i> Reports</a>
+      <a class="nav-item" href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+    </nav>
+    <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h3>Manage Users</h3><p>View and manage registered users</p></div>
+    </div>
+    <div class="content">
+      <div class="toolbar">
+        <input type="text" class="search-input" id="search-input" placeholder="Search name or email…" oninput="filterUsers()">
+        <button onclick="loadUsers()" style="padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:12px;"><i class="fas fa-refresh"></i> Refresh</button>
+        <span id="user-count" style="font-size:12px;color:var(--muted);margin-left:auto;"></span>
+      </div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>User</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="users-body"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+
+<script src="/shared/api.js"></script>
+<script>
+  const adminToken = localStorage.getItem('adminToken');
+  const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+  if (!adminToken || adminUser.role !== 'admin') window.location.href = 'login.html';
+  document.getElementById('admin-name').textContent = adminUser.name || 'Admin';
+  document.getElementById('admin-avatar').textContent = (adminUser.name || 'A').charAt(0).toUpperCase();
+  document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('adminToken'); localStorage.removeItem('adminUser'); window.location.href='login.html'; });
+
+  function adminApiCall(ep, opts = {}) {
+    return fetch('http://localhost:3000/api' + ep, { ...opts, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken, ...opts.headers } }).then(r => r.json());
+  }
+
+  let allUsers = [];
+
+  function filterUsers() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtered = allUsers.filter(u => (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q));
+    renderUsers(filtered);
+  }
+
+  function renderUsers(users) {
+    document.getElementById('user-count').textContent = users.length + ' users';
+    const tbody = document.getElementById('users-body');
+    if (!users.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-users"></i>No users found</div></td></tr>'; return; }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td><span class="user-init">${(u.name || 'U').charAt(0).toUpperCase()}</span>${u.name || '—'}</td>
+        <td>${u.email}</td>
+        <td>${u.phone || '—'}</td>
+        <td>${fmtDate(u.createdAt)}</td>
+        <td><span class="pill ${u.isActive ? 'active' : 'inactive'}">${u.isActive ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <button class="act-btn ${u.isActive ? 'toggle-on' : 'toggle-off'}" onclick="toggleUser('${u._id}', ${u.isActive})">
+            <i class="fas fa-${u.isActive ? 'user-slash' : 'user-check'}"></i> ${u.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  async function loadUsers() {
+    try {
+      const data = await adminApiCall('/auth/users');
+      allUsers = data.users || [];
+      filterUsers();
+    } catch(e) { document.getElementById('users-body').innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-exclamation-triangle"></i>Failed to load users</div></td></tr>'; }
+  }
+
+  async function toggleUser(id, isActive) {
+    try {
+      await adminApiCall(`/auth/users/${id}/toggle`, { method: 'PUT' });
+      showToast(isActive ? 'User deactivated' : 'User activated');
+      loadUsers();
+    } catch(e) { showToast(e.message || 'Failed', 'error'); }
+  }
+
+  loadUsers();
+</script>
+</body>
+</html>
