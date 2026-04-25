@@ -102,17 +102,18 @@
       <div class="card">
         <div class="card-header"><h3>Recent Transactions</h3></div>
         <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--border);">
-          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px;">
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;min-width:800px;">
             <thead><tr style="background:var(--card2);border-bottom:1px solid var(--border);">
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">TX ID</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">User</th>
+              <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Station</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Date</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Method</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Amount</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Status</th>
               <th style="text-align:left;padding:10px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;">Action</th>
             </tr></thead>
-            <tbody id="payments-body"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr></tbody>
+            <tbody id="payments-body"><tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">Loading…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -182,17 +183,33 @@
 
       // Table
       const tbody = document.getElementById('payments-body');
-      if (!payments.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted);">No payments found</td></tr>'; return; }
-      tbody.innerHTML = payments.slice(0, 10).map(p => `
+      if (!payments.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted);">No payments found</td></tr>'; return; }
+      tbody.innerHTML = payments.slice(0, 15).map(p => {
+        // Resolve actual user name — try payment.user first, then booking.user
+        const userName = p.user?.name || p.booking?.user?.name || 'Unknown User';
+        const userEmail = p.user?.email || p.booking?.user?.email || '';
+        const stationName = p.booking?.station?.name || p.booking?.station?.address || '—';
+        const userInitial = (userName || 'U').charAt(0).toUpperCase();
+        return `
         <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
           <td style="font-family:monospace;font-size:11px;color:var(--accent);padding:12px 14px;">${p.transactionId || '—'}</td>
-          <td style="padding:12px 14px;">${p.user?.name || 'User'}</td>
+          <td style="padding:12px 14px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">${userInitial}</div>
+              <div>
+                <div style="font-weight:500;font-size:12.5px;">${userName}</div>
+                <div style="font-size:10px;color:var(--muted);">${userEmail}</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:12px 14px;font-size:12px;">${stationName}</td>
           <td style="padding:12px 14px;color:var(--muted);font-size:12px;">${fmtDate(p.createdAt)}</td>
-          <td style="padding:12px 14px;">${p.paymentMethod || '—'}</td>
+          <td style="padding:12px 14px;text-transform:uppercase;font-size:11px;font-weight:500;">${p.paymentMethod || '—'}</td>
           <td style="padding:12px 14px;color:var(--green);font-weight:600;">₹${p.amount}</td>
           <td style="padding:12px 14px;"><span style="padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;background:${p.status==='completed'?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};color:${p.status==='completed'?'var(--green)':'var(--red)'};">${p.status}</span></td>
           <td style="padding:12px 14px;">${p.status === 'completed' ? `<button onclick="refundPayment('${p._id}')" style="padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--orange);">Refund</button>` : '—'}</td>
-        </tr>`).join('');
+        </tr>`;
+      }).join('');
     } catch(e) { console.error(e); }
   }
 

@@ -149,3 +149,38 @@ exports.toggleUserStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error.', error: error.message });
   }
 };
+
+// Admin: Update user details
+exports.updateUser = async (req, res) => {
+  try {
+    const { name, email, phone, role } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (role && ['user', 'admin'].includes(role)) user.role = role;
+    await user.save();
+
+    const updated = user.toObject();
+    delete updated.password;
+    res.json({ message: 'User updated.', user: updated });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+// Admin: Delete user
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    if (user.role === 'admin') return res.status(403).json({ message: 'Cannot delete admin users.' });
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted permanently.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};

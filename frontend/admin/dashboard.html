@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,236 +9,665 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
-    :root{--bg:#09090f;--bg2:#10101a;--card:#15151f;--card2:#1a1a28;--accent:#a855f7;--accent2:#7c3aed;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--text:#f1f0f7;--text2:#9090b0;--muted:#5a5a72;--border:rgba(168,85,247,0.14);--border2:rgba(168,85,247,0.25);--sidebar:240px;--glow:0 0 24px rgba(168,85,247,0.25);}
-    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}h1,h2,h3{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
-    .sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
-    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-    .logo-txt{font-size:19px;color:var(--accent);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
-    .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
-    .sidebar-admin{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-    .admin-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-    .admin-name{font-size:13px;font-weight:600;}.admin-role{font-size:10px;color:var(--accent);display:flex;align-items:center;gap:4px;}
-    .admin-role::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-    .nav{flex:1;padding:10px 0;overflow-y:auto;}.nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
-    .nav-item:hover{color:var(--text);background:rgba(168,85,247,0.06);}
-    .nav-item.active{color:var(--accent);background:rgba(168,85,247,0.1);border-left-color:var(--accent);}
-    .nav-item i{width:16px;text-align:center;font-size:13px;}
-    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
-    .btn-logout{width:100%;padding:9px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
-    .btn-logout:hover{background:rgba(239,68,68,0.2);}
-    .main{margin-left:var(--sidebar);flex:1;overflow-y:auto;display:flex;flex-direction:column;}
-    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-    .topbar-left h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
-    .topbar-left p{font-size:11px;color:var(--text2);margin-top:2px;}
-    .topbar-right{display:flex;align-items:center;gap:10px;}
-    .top-badge{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px;}
-    .top-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-    .content{padding:24px 28px;}
-    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px;}
-    .stat{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px;transition:.2s;}
-    .stat:hover{border-color:var(--accent);transform:translateY(-2px);}
-    .stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
-    .stat-icon.purple{background:rgba(168,85,247,0.12);color:var(--accent);}
-    .stat-icon.blue{background:rgba(59,130,246,0.12);color:var(--blue);}
-    .stat-icon.green{background:rgba(16,185,129,0.12);color:var(--green);}
-    .stat-icon.orange{background:rgba(245,158,11,0.12);color:var(--orange);}
-    .stat-icon.red{background:rgba(239,68,68,0.12);color:var(--red);}
-    .stat-val{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;line-height:1;}
-    .stat-lbl{font-size:11px;color:var(--text2);margin-top:4px;}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}@media(max-width:900px){.grid2{grid-template-columns:1fr;}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
-    .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-    .card-header h3{font-size:16px;font-weight:600;}
-    .chart-box{height:200px;position:relative;}
-    .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
-    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:600px;}
-    .tbl th{text-align:left;padding:11px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--card2);border-bottom:1px solid var(--border);white-space:nowrap;}
-    .tbl td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
-    .tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:rgba(168,85,247,.04);}
-    .pill{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;}
-    .pill.success,.pill.active,.pill.online,.pill.completed{background:rgba(16,185,129,0.15);color:var(--green);}
-    .pill.warning,.pill.pending{background:rgba(245,158,11,0.15);color:var(--orange);}
-    .pill.danger,.pill.cancelled,.pill.offline,.pill.inactive{background:rgba(239,68,68,0.15);color:var(--red);}
-    .pill.purple,.pill.in-progress{background:rgba(168,85,247,0.15);color:var(--accent);}
-    .pill.info,.pill.confirmed{background:rgba(6,182,212,0.15);color:var(--cyan);}
-    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:9px;padding:8px 16px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;}
-    .btn-primary:hover{box-shadow:var(--glow);}
-    .btn-secondary{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 14px;color:var(--text2);font-size:12px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;}
-    .btn-secondary:hover{color:var(--text);border-color:var(--accent);}
-    .act-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid;display:inline-flex;align-items:center;gap:3px;}
-    .act-btn.approve{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);}
-    .act-btn.edit{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--blue);}
-    .act-btn.del{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);}
-    .empty{text-align:center;padding:40px;color:var(--muted);}
-    .empty i{font-size:30px;margin-bottom:10px;display:block;opacity:.4;}
-    .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
-    .toast.show{transform:translateX(0);}
-    @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}}
+    :root {
+      --bg: #09090f;
+      --bg2: #10101a;
+      --card: #15151f;
+      --card2: #1a1a28;
+      --accent: #8b31e4;
+      --accent2: #6613f4;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --orange: #f59e0b;
+      --cyan: #06b6d4;
+      --text: #f1f0f7;
+      --text2: #9090b0;
+      --muted: #5a5a72;
+      --border: rgba(168, 85, 247, 0.14);
+      --border2: rgba(168, 85, 247, 0.25);
+      --sidebar: 240px;
+      --glow: 0 0 24px rgba(168, 85, 247, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Rajdhani', sans-serif; }
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar { width: var(--sidebar); background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+    .logo-txt { font-size: 19px; color: var(--accent); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+    .logo-sub { font-size: 9px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
+    .sidebar-admin { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .admin-name { font-size: 13px; font-weight: 600; }
+    .admin-role { font-size: 10px; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+    .admin-role::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+    .nav-sec { padding: 8px 18px 4px; font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; color: var(--text2); font-size: 13px; font-weight: 500; transition: .18s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: var(--text); background: rgba(168, 85, 247, 0.06); }
+    .nav-item.active { color: var(--accent); background: rgba(168, 85, 247, 0.1); border-left-color: var(--accent); }
+    .nav-item i { width: 16px; text-align: center; font-size: 13px; }
+    .sidebar-bottom { padding: 14px 18px; border-top: 1px solid var(--border); }
+    .btn-logout { width: 100%; padding: 9px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: var(--red); font-size: 12px; cursor: pointer; transition: .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-logout:hover { background: rgba(239, 68, 68, 0.2); }
+    .main { margin-left: var(--sidebar); flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+    .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h3 { font-size: 20px; font-weight: 700; }
+    .topbar-left p { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .top-badge { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 5px 12px; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 5px; }
+    .top-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .content { padding: 24px 28px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .stat { background: var(--card); border: 1px solid var(--border); border-radius: 13px; padding: 18px; transition: .2s; cursor: pointer; }
+    .stat:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--glow); }
+    .stat-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 10px; }
+    .stat-icon.purple { background: rgba(139, 49, 228, 0.12); color: var(--accent); }
+    .stat-icon.blue { background: rgba(59, 130, 246, 0.12); color: var(--blue); }
+    .stat-icon.green { background: rgba(16, 185, 129, 0.12); color: var(--green); }
+    .stat-icon.orange { background: rgba(245, 158, 11, 0.12); color: var(--orange); }
+    .stat-icon.red { background: rgba(239, 68, 68, 0.12); color: var(--red); }
+    .stat-val { font-family: 'Rajdhani', sans-serif; font-size: 30px; font-weight: 700; line-height: 1; }
+    .stat-lbl { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:900px) { .grid2 { grid-template-columns: 1fr; } }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-header h3 { font-size: 16px; font-weight: 600; }
+    .chart-box { height: 220px; position: relative; }
+
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 700px; }
+    .tbl th { text-align: left; padding: 11px 14px; color: var(--muted); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; background: var(--card2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .tbl td { padding: 12px 14px; border-bottom: 1px solid rgba(255, 255, 255, .03); vertical-align: middle; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: rgba(168, 85, 247, .04); }
+    .pill { padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; display: inline-block; }
+    .pill.completed { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .pill.pending { background: rgba(245, 158, 11, 0.15); color: var(--orange); }
+    .pill.cancelled { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+    .pill.confirmed { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+    .pill.in-progress { background: rgba(139, 49, 228, 0.15); color: var(--accent); }
+
+    .btn-secondary { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 8px 14px; color: var(--text2); font-size: 12px; cursor: pointer; transition: .2s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
+    .act-btn { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; transition: .15s; border: 1px solid; display: inline-flex; align-items: center; gap: 3px; margin-right: 4px; }
+    .act-btn.approve { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); color: var(--green); }
+    .act-btn.blue { background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: var(--blue); }
+    .act-btn.del { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: var(--red); }
+    .empty { text-align: center; padding: 40px; color: var(--muted); }
+    .empty i { font-size: 30px; margin-bottom: 10px; display: block; opacity: .4; }
+
+    .user-rev-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.04); transition: .15s; }
+    .user-rev-row:hover { background: rgba(139, 49, 228, 0.04); }
+    .user-rev-row:last-child { border-bottom: none; }
+    .user-rev-left { display: flex; align-items: center; gap: 10px; }
+    .user-rev-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .user-rev-name { font-size: 13px; font-weight: 500; }
+    .user-rev-email { font-size: 10px; color: var(--muted); }
+    .user-rev-amt { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--green); }
+    .user-rev-bookings { font-size: 10px; color: var(--text2); text-align: right; }
+
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border2); border-radius: 12px; padding: 13px 18px; display: flex; align-items: center; gap: 10px; font-size: 13px; z-index: 9999; transform: translateX(240%); transition: .35s cubic-bezier(.34, 1.56, .64, 1); }
+    .toast.show { transform: translateX(0); }
+
+    .loading-pulse { animation: pulse-anim 1.5s ease-in-out infinite; }
+    @keyframes pulse-anim { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    @media(max-width:768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+    }
   </style>
 </head>
+
 <body>
-<div style="display:flex;height:100vh;overflow:hidden;">
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Admin Panel</div></div>
-    <div class="sidebar-admin">
-      <div class="admin-avatar" id="admin-avatar">A</div>
-      <div><div class="admin-name" id="admin-name">Admin</div><div class="admin-role">Administrator</div></div>
-    </div>
-    <nav class="nav">
-      <div class="nav-sec">Overview</div>
-      <a class="nav-item active" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
-      <a class="nav-item" href="bookings.html"><i class="fas fa-calendar-alt"></i> Bookings</a>
-      <div class="nav-sec">Management</div>
-      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Stations</a>
-      <a class="nav-item" href="users.html"><i class="fas fa-users"></i> Users</a>
-      <a class="nav-item" href="revenue.html"><i class="fas fa-chart-line"></i> Revenue</a>
-      <div class="nav-sec">System</div>
-      <a class="nav-item" href="reports.html"><i class="fas fa-file-export"></i> Reports</a>
-      <a class="nav-item" href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-    </nav>
-    <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
-  </aside>
-
-  <main class="main">
-    <div class="topbar">
-      <div class="topbar-left"><h3>Admin Dashboard</h3><p id="admin-greeting">System overview</p></div>
-      <div class="topbar-right">
-        <div class="top-badge">System Online</div>
+  <div style="display:flex;height:100vh;overflow:hidden;">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div>
+        <div class="logo-sub">Admin Panel</div>
       </div>
-    </div>
-    <div class="content">
-      <!-- Stats -->
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-icon purple"><i class="fas fa-charging-station"></i></div><div class="stat-val" id="s-stations">—</div><div class="stat-lbl">Total Stations</div></div>
-        <div class="stat"><div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div><div class="stat-val" id="s-bookings">—</div><div class="stat-lbl">Total Bookings</div></div>
-        <div class="stat"><div class="stat-icon green"><i class="fas fa-users"></i></div><div class="stat-val" id="s-users">—</div><div class="stat-lbl">Registered Users</div></div>
-        <div class="stat"><div class="stat-icon orange"><i class="fas fa-indian-rupee-sign"></i></div><div class="stat-val" id="s-revenue">—</div><div class="stat-lbl">Total Revenue</div></div>
-        <div class="stat"><div class="stat-icon red"><i class="fas fa-bolt"></i></div><div class="stat-val" id="s-active">—</div><div class="stat-lbl">Active Sessions</div></div>
+      <div class="sidebar-admin">
+        <div class="admin-avatar" id="admin-avatar">A</div>
+        <div>
+          <div class="admin-name" id="admin-name">Admin</div>
+          <div class="admin-role">Administrator</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <div class="nav-sec">Overview</div>
+        <a class="nav-item active" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a class="nav-item" href="bookings.html"><i class="fas fa-calendar-alt"></i> Bookings</a>
+        <div class="nav-sec">Management</div>
+        <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Stations</a>
+        <a class="nav-item" href="users.html"><i class="fas fa-users"></i> Users</a>
+        <a class="nav-item" href="revenue.html"><i class="fas fa-chart-line"></i> Revenue</a>
+        <div class="nav-sec">System</div>
+        <a class="nav-item" href="reports.html"><i class="fas fa-file-export"></i> Reports</a>
+        <a class="nav-item" href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h3>Admin Dashboard</h3>
+          <p id="admin-greeting">System overview</p>
+        </div>
+        <div class="topbar-right">
+          <div class="top-badge">System Online</div>
+        </div>
       </div>
 
-      <!-- Charts + Recent -->
-      <div class="grid2">
+      <div class="content">
+        <!-- Stats -->
+        <div class="stat-grid">
+          <div class="stat" onclick="location.href='stations.html'" title="Click to manage stations">
+            <div class="stat-icon purple"><i class="fas fa-charging-station"></i></div>
+            <div class="stat-val loading-pulse" id="s-stations">—</div>
+            <div class="stat-lbl">Total Stations</div>
+          </div>
+          <div class="stat" onclick="location.href='bookings.html'" title="Click to view bookings">
+            <div class="stat-icon blue"><i class="fas fa-calendar-check"></i></div>
+            <div class="stat-val loading-pulse" id="s-bookings">—</div>
+            <div class="stat-lbl">Total Bookings</div>
+          </div>
+          <div class="stat" onclick="location.href='users.html'" title="Click to manage users">
+            <div class="stat-icon green"><i class="fas fa-users"></i></div>
+            <div class="stat-val loading-pulse" id="s-users">—</div>
+            <div class="stat-lbl">Registered Users</div>
+          </div>
+          <div class="stat" onclick="location.href='revenue.html'" title="Click to view revenue">
+            <div class="stat-icon orange"><i class="fas fa-indian-rupee-sign"></i></div>
+            <div class="stat-val loading-pulse" id="s-revenue">—</div>
+            <div class="stat-lbl">Total Revenue</div>
+          </div>
+          <div class="stat" onclick="location.href='bookings.html'" title="Click to view active sessions">
+            <div class="stat-icon red"><i class="fas fa-bolt"></i></div>
+            <div class="stat-val loading-pulse" id="s-active">—</div>
+            <div class="stat-lbl">Active Sessions</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><h3>Booking Trends (Last 7 Days)</h3></div>
+            <div class="chart-box"><canvas id="bookingChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Revenue Overview (Last 7 Days)</h3></div>
+            <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Recent Bookings -->
         <div class="card">
-          <div class="card-header"><h3>Booking Trends</h3></div>
-          <div class="chart-box"><canvas id="bookingChart"></canvas></div>
+          <div class="card-header">
+            <h3>Recent User Bookings <span id="booking-count" style="font-size:12px;color:var(--muted);font-weight:400;margin-left:8px;"></span></h3>
+            <a class="btn-secondary" href="bookings.html"><i class="fas fa-arrow-right"></i> View All</a>
+          </div>
+          <div class="table-wrap">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Station</th>
+                  <th>Date & Slot</th>
+                  <th>Vehicle</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recent-bookings">
+                <tr><td colspan="7" class="empty"><i class="fas fa-spinner fa-spin"></i>Loading bookings…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="card">
-          <div class="card-header"><h3>Revenue Overview</h3></div>
-          <div class="chart-box"><canvas id="revenueChart"></canvas></div>
+
+        <!-- User Revenue Breakdown -->
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><h3>Revenue Per User</h3></div>
+            <div id="user-revenue-list" style="max-height:320px;overflow-y:auto;">
+              <div class="empty"><i class="fas fa-spinner fa-spin"></i>Loading…</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Booking Status Distribution</h3></div>
+            <div style="height:260px;position:relative;"><canvas id="statusChart"></canvas></div>
+          </div>
         </div>
       </div>
+    </main>
+  </div>
 
-      <!-- Recent bookings -->
-      <div class="card">
-        <div class="card-header">
-          <h3>Recent Bookings</h3>
-          <a class="btn-secondary" href="bookings.html"><i class="fas fa-arrow-right"></i> View All</a>
-        </div>
-        <div class="table-wrap">
-          <table class="tbl">
-            <thead><tr><th>User</th><th>Station</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody id="recent-bookings"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </main>
-</div>
+  <div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
 
-<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+  <script src="/shared/api.js"></script>
+  <script>
+    const adminToken = localStorage.getItem('adminToken');
+    const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+    if (!adminToken || adminUser.role !== 'admin') window.location.href = 'login.html';
 
-<script src="/shared/api.js"></script>
-<script>
-  // Auth check
-  const adminToken = localStorage.getItem('adminToken');
-  const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
-  if (!adminToken || adminUser.role !== 'admin') { window.location.href = 'login.html'; }
-
-  document.getElementById('admin-name').textContent = adminUser.name || 'Admin';
-  document.getElementById('admin-avatar').textContent = (adminUser.name || 'A').charAt(0).toUpperCase();
-  document.getElementById('admin-greeting').textContent = `Welcome back, ${(adminUser.name || 'Admin').split(' ')[0]}!`;
-  document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('adminToken'); localStorage.removeItem('adminUser'); window.location.href='login.html'; });
-
-  // Override apiCall to use adminToken
-  function adminApiCall(endpoint, options = {}) {
-    return fetch('http://localhost:3000/api' + endpoint, {
-      ...options,
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken, ...options.headers }
-    }).then(r => r.json());
-  }
-
-  // Render charts
-  function makeChart(id, type, labels, data, color) {
-    const ctx = document.getElementById(id).getContext('2d');
-    const grd = ctx.createLinearGradient(0, 0, 0, 200);
-    grd.addColorStop(0, color.replace('1)', '0.3)')); grd.addColorStop(1, color.replace('1)', '0)'));
-    new Chart(ctx, {
-      type, data: { labels, datasets: [{ data, borderColor: color, backgroundColor: grd, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: color, pointRadius: 3 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(21,21,31,.95)', titleColor: '#f1f0f7', bodyColor: '#9090b0', borderColor: 'rgba(168,85,247,.2)', borderWidth: 1 } },
-        scales: { x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 } } } } }
-    });
-  }
-
-  async function loadDashboard() {
-    try {
-      const [stRes, bkRes, usRes, pyRes] = await Promise.all([
-        adminApiCall('/stations'),
-        adminApiCall('/bookings'),
-        adminApiCall('/auth/users'),
-        adminApiCall('/payments')
-      ]);
-
-      const stations = stRes.stations || [];
-      const bookings = bkRes.bookings || [];
-      const users = usRes.users || [];
-      const payments = pyRes.payments || [];
-
-      document.getElementById('s-stations').textContent = stations.length;
-      document.getElementById('s-bookings').textContent = bookings.length;
-      document.getElementById('s-users').textContent = users.length;
-      const revenue = payments.filter(p => p.status === 'completed').reduce((s, p) => s + (p.amount || 0), 0);
-      document.getElementById('s-revenue').textContent = '₹' + revenue.toFixed(0);
-      const activeSessions = bookings.filter(b => b.status === 'in-progress').length;
-      document.getElementById('s-active').textContent = activeSessions;
-
-      // Chart data — last 7 months
-      const months = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
-      const bkCounts = months.map((_, i) => Math.floor(Math.random() * 30 + 10));
-      const revData = months.map((_, i) => Math.floor(Math.random() * 5000 + 2000));
-      makeChart('bookingChart', 'line', months, bkCounts, 'rgba(168,85,247,1)');
-      makeChart('revenueChart', 'bar', months, revData, 'rgba(59,130,246,1)');
-
-      // Recent bookings
-      const tbody = document.getElementById('recent-bookings');
-      if (!bookings.length) {
-        tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings yet</div></td></tr>';
-      } else {
-        tbody.innerHTML = bookings.slice(0, 8).map(b => `
-          <tr>
-            <td>${b.user?.name || 'User'}</td>
-            <td>${b.station?.name || 'Station'}</td>
-            <td>${fmtDate(b.startTime)}</td>
-            <td style="color:var(--green);">₹${b.totalAmount || 0}</td>
-            <td><span class="pill ${b.status}">${b.status}</span></td>
-            <td>${b.status === 'pending' ? `<button class="act-btn approve" onclick="confirmBooking('${b._id}')">Confirm</button>` : '—'}</td>
-          </tr>`).join('');
-      }
-    } catch(e) {
-      console.error(e);
-      document.getElementById('s-stations').textContent = '—';
+    // ── Helpers ──
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      const icon = t.querySelector('i');
+      document.getElementById('toast-msg').textContent = msg;
+      icon.className = type === 'error' ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
+      icon.style.color = type === 'error' ? 'var(--red)' : 'var(--green)';
+      t.className = 'toast show';
+      clearTimeout(t._t);
+      t._t = setTimeout(() => t.className = 'toast', 3000);
     }
-  }
 
-  async function confirmBooking(id) {
-    try {
-      await adminApiCall(`/bookings/${id}/confirm`, { method: 'PUT' });
-      showToast('Booking confirmed!');
-      loadDashboard();
-    } catch(e) { showToast(e.message || 'Failed', 'error'); }
-  }
+    function fmtDate(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    function fmtDateTime(d) {
+      if (!d) return '—';
+      return new Date(d).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    }
 
-  loadDashboard();
-</script>
+    async function adminApiCall(endpoint, options = {}) {
+      const res = await fetch('http://localhost:3000/api' + endpoint, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken, ...options.headers }
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'API Error ' + res.status);
+      }
+      return res.json();
+    }
+
+    // ── Chart instances (destroy before recreate) ──
+    let bookingChartInstance = null;
+    let revenueChartInstance = null;
+    let statusChartInstance = null;
+
+    // ── Build Charts ──
+    function buildBookingChart(bookings) {
+      const ctx = document.getElementById('bookingChart').getContext('2d');
+      if (bookingChartInstance) bookingChartInstance.destroy();
+
+      // Group bookings by day for last 7 days
+      const days = [];
+      const counts = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const label = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const nextDay = new Date(d); nextDay.setDate(nextDay.getDate() + 1);
+        const count = bookings.filter(b => {
+          const bd = new Date(b.createdAt || b.startTime);
+          return bd >= d && bd < nextDay;
+        }).length;
+        days.push(label);
+        counts.push(count);
+      }
+
+      const grd = ctx.createLinearGradient(0, 0, 0, 220);
+      grd.addColorStop(0, 'rgba(139, 49, 228, 0.35)');
+      grd.addColorStop(1, 'rgba(139, 49, 228, 0)');
+
+      bookingChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Bookings',
+            data: counts,
+            borderColor: '#8b31e4',
+            backgroundColor: grd,
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#8b31e4',
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 }, stepSize: 1 } }
+          }
+        }
+      });
+    }
+
+    function buildRevenueChart(payments) {
+      const ctx = document.getElementById('revenueChart').getContext('2d');
+      if (revenueChartInstance) revenueChartInstance.destroy();
+
+      const days = [];
+      const amounts = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const label = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const nextDay = new Date(d); nextDay.setDate(nextDay.getDate() + 1);
+        const dayTotal = payments
+          .filter(p => p.status === 'completed')
+          .filter(p => { const pd = new Date(p.paidAt || p.createdAt); return pd >= d && pd < nextDay; })
+          .reduce((s, p) => s + (p.amount || 0), 0);
+        days.push(label);
+        amounts.push(dayTotal);
+      }
+
+      const grd = ctx.createLinearGradient(0, 0, 0, 220);
+      grd.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
+      grd.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+      revenueChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Revenue (₹)',
+            data: amounts,
+            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+            borderColor: '#10b981',
+            borderWidth: 1.5,
+            borderRadius: 6,
+            hoverBackgroundColor: '#10b981'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#5a5a72', font: { size: 10 }, callback: v => '₹' + v } }
+          }
+        }
+      });
+    }
+
+    function buildStatusChart(bookings) {
+      const ctx = document.getElementById('statusChart').getContext('2d');
+      if (statusChartInstance) statusChartInstance.destroy();
+
+      const statusMap = {};
+      bookings.forEach(b => { statusMap[b.status] = (statusMap[b.status] || 0) + 1; });
+      const labels = Object.keys(statusMap);
+      const data = Object.values(statusMap);
+      const colors = {
+        pending: '#f59e0b', confirmed: '#06b6d4', 'in-progress': '#8b31e4',
+        completed: '#10b981', cancelled: '#ef4444'
+      };
+
+      statusChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+          datasets: [{
+            data,
+            backgroundColor: labels.map(l => colors[l] || '#6b7280'),
+            borderWidth: 0,
+            hoverOffset: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: '#9090b0', font: { size: 11 }, padding: 12, usePointStyle: true, pointStyleWidth: 10 }
+            }
+          }
+        }
+      });
+    }
+
+    // ── User Revenue Breakdown ──
+    function buildUserRevenue(bookings, payments) {
+      const container = document.getElementById('user-revenue-list');
+      // Group by user
+      const userMap = {};
+      bookings.forEach(b => {
+        const uid = b.user?._id || b.user || 'unknown';
+        if (!userMap[uid]) {
+          userMap[uid] = {
+            name: b.user?.name || 'Unknown',
+            email: b.user?.email || '',
+            totalAmount: 0,
+            bookingCount: 0
+          };
+        }
+        userMap[uid].totalAmount += b.totalAmount || 0;
+        userMap[uid].bookingCount += 1;
+      });
+
+      // Also tally from payments if available
+      payments.forEach(p => {
+        const uid = p.user?._id || p.user || 'unknown';
+        // Only count if we haven't tracked from bookings already
+        if (!userMap[uid]) {
+          userMap[uid] = {
+            name: p.user?.name || p.booking?.user?.name || 'Unknown',
+            email: p.user?.email || '',
+            totalAmount: 0,
+            bookingCount: 0
+          };
+        }
+      });
+
+      const users = Object.values(userMap).sort((a, b) => b.totalAmount - a.totalAmount);
+
+      if (!users.length) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-users"></i>No user data yet</div>';
+        return;
+      }
+
+      container.innerHTML = users.map(u => `
+        <div class="user-rev-row">
+          <div class="user-rev-left">
+            <div class="user-rev-avatar">${(u.name || 'U').charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="user-rev-name">${u.name}</div>
+              <div class="user-rev-email">${u.email}</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div class="user-rev-amt">₹${u.totalAmount.toFixed(0)}</div>
+            <div class="user-rev-bookings">${u.bookingCount} booking${u.bookingCount !== 1 ? 's' : ''}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Render Recent Bookings Table ──
+    function renderBookings(bookings) {
+      const tbody = document.getElementById('recent-bookings');
+      document.getElementById('booking-count').textContent = bookings.length ? `(${bookings.length} total)` : '';
+
+      if (!bookings.length) {
+        tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings found yet.<br><span style="font-size:11px;">Bookings made through the user portal will appear here.</span></div></td></tr>`;
+        return;
+      }
+
+      const sorted = [...bookings].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      tbody.innerHTML = sorted.slice(0, 10).map(b => {
+        const userName = b.user?.name || 'Guest';
+        const userEmail = b.user?.email || '';
+        const userInitial = (userName || 'G').charAt(0).toUpperCase();
+        const stationName = b.station?.name || 'N/A';
+        const stationAddr = b.station?.address || '';
+        const dateStr = fmtDateTime(b.startTime || b.createdAt);
+        const duration = b.duration ? (b.duration + 'h') : '—';
+        const charger = b.chargerType || b.station?.chargingSpeed || '';
+        const vehicleNum = b.vehicleNumber || '';
+        const vehicleType = b.vehicleType || 'car';
+        const amount = b.totalAmount != null ? '₹' + b.totalAmount : '—';
+        const status = b.status || 'pending';
+
+        let actions = '';
+        if (status === 'pending') {
+          actions = `<button class="act-btn approve" onclick="confirmBooking('${b._id}')"><i class="fas fa-check"></i> Confirm</button>
+                     <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
+        } else if (status === 'confirmed') {
+          actions = `<button class="act-btn blue" onclick="startCharging('${b._id}')"><i class="fas fa-play"></i> Start</button>
+                     <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
+        } else if (status === 'in-progress') {
+          actions = `<button class="act-btn approve" onclick="completeCharging('${b._id}')"><i class="fas fa-flag-checkered"></i> Done</button>`;
+        } else {
+          actions = '<span style="color:var(--muted);font-size:11px;">—</span>';
+        }
+
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${userInitial}</div>
+              <div>
+                <div style="font-weight:600;font-size:12.5px;">${userName}</div>
+                <div style="font-size:10px;color:var(--muted);">${userEmail}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-weight:500;font-size:12px;">${stationName}</div>
+            ${stationAddr ? `<div style="font-size:10px;color:var(--muted);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stationAddr}</div>` : ''}
+          </td>
+          <td style="font-size:11px;">
+            <div>${dateStr}</div>
+            <div style="font-size:10px;color:var(--muted);">${duration}${charger ? ' · ' + charger : ''}</div>
+          </td>
+          <td style="font-size:11px;">
+            <div>${vehicleNum || vehicleType}</div>
+            ${vehicleNum ? `<div style="font-size:10px;color:var(--muted);text-transform:capitalize;"><i class="fas fa-${vehicleType === 'bike' || vehicleType === 'scooter' ? 'motorcycle' : 'car'}" style="font-size:9px;margin-right:2px;"></i>${vehicleType}</div>` : ''}
+          </td>
+          <td style="color:var(--green);font-weight:600;">${amount}</td>
+          <td><span class="pill ${status}">${status}</span></td>
+          <td style="white-space:nowrap;">${actions}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── Booking Actions ──
+    async function confirmBooking(id) {
+      try {
+        await adminApiCall(`/bookings/${id}/confirm`, { method: 'PUT' });
+        showToast('Booking confirmed!');
+        loadDashboard();
+      } catch (e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        await adminApiCall(`/bookings/${id}/cancel`, { method: 'PUT' });
+        showToast('Booking cancelled');
+        loadDashboard();
+      } catch (e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    async function startCharging(id) {
+      try {
+        await adminApiCall(`/bookings/${id}/start`, { method: 'PUT' });
+        showToast('Charging started!');
+        loadDashboard();
+      } catch (e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    async function completeCharging(id) {
+      try {
+        await adminApiCall(`/bookings/${id}/complete`, { method: 'PUT' });
+        showToast('Charging completed!');
+        loadDashboard();
+      } catch (e) { showToast('Failed: ' + e.message, 'error'); }
+    }
+
+    // ── Main Load ──
+    async function loadDashboard() {
+      // Set admin info
+      document.getElementById('admin-name').textContent = adminUser.name || 'Admin';
+      document.getElementById('admin-avatar').textContent = (adminUser.name || 'A')[0].toUpperCase();
+      document.getElementById('admin-greeting').textContent = `Welcome back, ${(adminUser.name || 'Admin').split(' ')[0]}!`;
+
+      try {
+        // Fetch all data in parallel
+        const [stData, bkData, usData, pyData] = await Promise.all([
+          adminApiCall('/stations').catch(() => ({ stations: [] })),
+          adminApiCall('/bookings').catch(() => ({ bookings: [] })),
+          adminApiCall('/auth/users').catch(() => ({ users: [] })),
+          adminApiCall('/payments').catch(() => ({ payments: [] }))
+        ]);
+
+        const stations = stData.stations || [];
+        const bookings = bkData.bookings || [];
+        const users = usData.users || [];
+        const payments = pyData.payments || [];
+
+        // Remove loading pulse
+        document.querySelectorAll('.loading-pulse').forEach(el => el.classList.remove('loading-pulse'));
+
+        // ── Stats ──
+        document.getElementById('s-stations').textContent = stations.length;
+        document.getElementById('s-bookings').textContent = bookings.length;
+        document.getElementById('s-users').textContent = users.length;
+        const totalRevenue = payments.filter(p => p.status === 'completed').reduce((s, p) => s + (p.amount || 0), 0);
+        document.getElementById('s-revenue').textContent = '₹' + totalRevenue.toLocaleString('en-IN');
+        document.getElementById('s-active').textContent = bookings.filter(b => b.status === 'in-progress').length;
+
+        // ── Charts ──
+        buildBookingChart(bookings);
+        buildRevenueChart(payments);
+        if (bookings.length) {
+          buildStatusChart(bookings);
+        } else {
+          document.getElementById('statusChart').parentElement.innerHTML = '<div class="empty" style="padding:60px 20px;"><i class="fas fa-chart-pie"></i>No booking data for chart</div>';
+        }
+
+        // ── Recent Bookings Table ──
+        renderBookings(bookings);
+
+        // ── User Revenue Breakdown ──
+        buildUserRevenue(bookings, payments);
+
+      } catch (e) {
+        console.error('Dashboard load error:', e);
+        document.querySelectorAll('.loading-pulse').forEach(el => {
+          el.classList.remove('loading-pulse');
+          el.textContent = '!';
+        });
+        showToast('Failed to load dashboard data: ' + e.message, 'error');
+      }
+    }
+
+    // ── Logout ──
+    document.getElementById('logout-btn').onclick = () => {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      window.location.href = 'login.html';
+    };
+
+    // ── Init ──
+    loadDashboard();
+  </script>
 </body>
+
 </html>

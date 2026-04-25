@@ -407,14 +407,37 @@
       // Valid MongoDB ObjectId = 24 hex chars
       const isDbStation = ctx.stationId && /^[a-f\d]{24}$/i.test(String(ctx.stationId));
 
-      let bookingId = 'BK' + Date.now(); // fallback for OSM stations
+      let resolvedStationId = ctx.stationId;
 
-      if (isDbStation) {
-        // ── Real DB station: call booking + payment APIs ──
+      // If NOT a DB station, find-or-create it in the database first
+      if (!isDbStation) {
+        try {
+          const stationRes = await apiCall('/stations/find-or-create', {
+            method: 'POST',
+            body: JSON.stringify({
+              name: ctx.stationName || 'EV Station',
+              address: ctx.stationAddr || 'Live Station',
+              latitude: ctx.latitude || 0,
+              longitude: ctx.longitude || 0,
+              pricePerHour: Number(ctx.price) || 8,
+              chargingSpeed: 'fast',
+              source: 'live'
+            })
+          });
+          resolvedStationId = stationRes.station?._id || stationRes.station?.id;
+        } catch (e) {
+          console.warn('[Payment] Could not create station record:', e.message);
+        }
+      }
+
+      let bookingId = 'BK' + Date.now(); // fallback only
+
+      // Create booking + payment via API (for ALL stations now)
+      if (resolvedStationId && /^[a-f\d]{24}$/i.test(String(resolvedStationId))) {
         const bookRes = await apiCall('/bookings', {
           method: 'POST',
           body: JSON.stringify({
-            station:     ctx.stationId,
+            station:     resolvedStationId,
             slot:        ctx.slotId || null,
             startTime:   startISO,
             endTime:     endISO,
@@ -435,20 +458,18 @@
             bankName:      selectedBank || undefined
           })
         });
+      } else {
+        // Absolute fallback: simulate short delay
+        await new Promise(r => setTimeout(r, 1200));
       }
-      // OSM stations: no backend call — generate local booking ref only
-      // (station data exists in OSM/map, not in our DB)
-
-      // Simulate short processing delay for UX
-      if (!isDbStation) await new Promise(r => setTimeout(r, 1200));
 
       // Save confirmation context — tagged with userId to prevent cross-user bleed
       const currentUserId = user._id || user.id || user.email || 'guest';
       sessionStorage.setItem('confirmationData', JSON.stringify({
         bookingId,
         txnId,
-        userId:      currentUserId,   // ← CRITICAL: user ownership tag
-        stationId:   ctx.stationId,
+        userId:      currentUserId,
+        stationId:   resolvedStationId || ctx.stationId,
         stationName: ctx.stationName  || 'EV Charging Station',
         stationAddr: ctx.stationAddr  || '',
         date:        ctx.date,

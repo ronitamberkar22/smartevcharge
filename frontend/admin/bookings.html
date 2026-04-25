@@ -35,7 +35,7 @@
     .search-input:focus{border-color:var(--accent);}
     .filter-sel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
     .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
-    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;min-width:800px;}
+    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
     .tbl th{text-align:left;padding:11px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--card2);border-bottom:1px solid var(--border);white-space:nowrap;}
     .tbl td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
     .tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:rgba(168,85,247,0.04);}
@@ -51,6 +51,10 @@
     .empty i{font-size:30px;margin-bottom:10px;display:block;opacity:.4;}
     .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
     .toast.show{transform:translateX(0);}
+    .stat-row{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+    .mini-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:120px;}
+    .mini-stat .val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
+    .mini-stat .lbl{font-size:10px;color:var(--muted);margin-top:2px;}
   </style>
 </head>
 <body>
@@ -78,9 +82,19 @@
 
   <main class="main">
     <div class="topbar">
-      <div class="topbar-left"><h3>Manage Bookings</h3><p>View, confirm, and manage all bookings</p></div>
+      <div class="topbar-left"><h3>Manage Bookings</h3><p>View, confirm, and manage all user bookings</p></div>
     </div>
     <div class="content">
+      <!-- Stats row -->
+      <div class="stat-row" id="booking-stats">
+        <div class="mini-stat"><div class="val" id="s-total">0</div><div class="lbl">Total Bookings</div></div>
+        <div class="mini-stat"><div class="val" style="color:var(--orange);" id="s-pending">0</div><div class="lbl">Pending</div></div>
+        <div class="mini-stat"><div class="val" style="color:var(--cyan);" id="s-confirmed">0</div><div class="lbl">Confirmed</div></div>
+        <div class="mini-stat"><div class="val" style="color:var(--accent);" id="s-progress">0</div><div class="lbl">In Progress</div></div>
+        <div class="mini-stat"><div class="val" style="color:var(--green);" id="s-completed">0</div><div class="lbl">Completed</div></div>
+        <div class="mini-stat"><div class="val" style="color:var(--green);" id="s-revenue">₹0</div><div class="lbl">Total Revenue</div></div>
+      </div>
+
       <div class="toolbar">
         <input type="text" class="search-input" id="search-input" placeholder="Search user or station…" oninput="filterTable()">
         <select class="filter-sel" id="status-filter" onchange="filterTable()">
@@ -95,8 +109,16 @@
       </div>
       <div class="table-wrap">
         <table class="tbl">
-          <thead><tr><th>#ID</th><th>User</th><th>Station</th><th>Date & Time</th><th>Duration</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="bookings-body"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+          <thead><tr>
+            <th>User</th>
+            <th>Station</th>
+            <th>Date & Slot</th>
+            <th>Vehicle</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr></thead>
+          <tbody id="bookings-body"><tr><td colspan="7" class="empty"><i class="fas fa-spinner fa-spin"></i>Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -114,6 +136,16 @@
   document.getElementById('admin-avatar').textContent = (adminUser.name || 'A').charAt(0).toUpperCase();
   document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('adminToken'); localStorage.removeItem('adminUser'); window.location.href='login.html'; });
 
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.querySelector('i').className = type === 'error' ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
+    t.querySelector('i').style.color = type === 'error' ? 'var(--red)' : 'var(--green)';
+    t.className = 'toast show';
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.className = 'toast', 3000);
+  }
+
   function adminApiCall(ep, opts = {}) {
     return fetch('http://localhost:3000/api' + ep, { ...opts, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken, ...opts.headers } }).then(r => r.json());
   }
@@ -124,7 +156,7 @@
     const q = document.getElementById('search-input').value.toLowerCase();
     const s = document.getElementById('status-filter').value;
     const filtered = allBookings.filter(b => {
-      const match = (b.user?.name || '').toLowerCase().includes(q) || (b.station?.name || '').toLowerCase().includes(q);
+      const match = (b.user?.name || '').toLowerCase().includes(q) || (b.user?.email || '').toLowerCase().includes(q) || (b.station?.name || '').toLowerCase().includes(q);
       const statusMatch = !s || b.status === s;
       return match && statusMatch;
     });
@@ -133,30 +165,78 @@
 
   function renderBookings(bookings) {
     const tbody = document.getElementById('bookings-body');
-    if (!bookings.length) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings found</div></td></tr>'; return; }
-    tbody.innerHTML = bookings.map(b => `
-      <tr>
-        <td style="font-family:monospace;color:var(--accent);font-size:11px;">${b._id?.slice(-8) || '—'}</td>
-        <td>${b.user?.name || 'User'}<br><span style="font-size:10px;color:var(--muted);">${b.user?.email || ''}</span></td>
-        <td>${b.station?.name || 'Station'}</td>
-        <td>${fmtDateTime(b.startTime)}</td>
-        <td>${b.duration || 1}h</td>
-        <td style="color:var(--green);">₹${b.totalAmount || 0}</td>
-        <td><span class="pill ${b.status}">${b.status}</span></td>
+    if (!bookings.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings found</div></td></tr>'; return; }
+
+    const sorted = [...bookings].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    tbody.innerHTML = sorted.map(b => {
+      const userName = b.user?.name || 'Unknown User';
+      const userEmail = b.user?.email || '';
+      const userInitial = (userName || 'U').charAt(0).toUpperCase();
+      const stationName = b.station?.name || 'N/A';
+      const stationAddr = b.station?.address || '';
+      const dateStr = fmtDateTime(b.startTime || b.createdAt);
+      const duration = b.duration ? (b.duration + 'h') : '—';
+      const charger = b.chargerType || b.station?.chargingSpeed || '';
+      const vehicleNum = b.vehicleNumber || '';
+      const vehicleType = b.vehicleType || 'car';
+      const amount = b.totalAmount != null ? '₹' + b.totalAmount : '—';
+      const status = b.status || 'pending';
+
+      let actions = '';
+      if (status === 'pending') {
+        actions = `<button class="act-btn approve" onclick="confirmBooking('${b._id}')"><i class="fas fa-check"></i> Confirm</button>
+                   <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
+      } else if (status === 'confirmed') {
+        actions = `<button class="act-btn blue" onclick="startCharging('${b._id}')"><i class="fas fa-play"></i> Start</button>
+                   <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
+      } else if (status === 'in-progress') {
+        actions = `<button class="act-btn approve" onclick="completeCharging('${b._id}')"><i class="fas fa-flag-checkered"></i> Complete</button>`;
+      } else {
+        actions = '<span style="color:var(--muted);font-size:11px;">—</span>';
+      }
+
+      return `<tr>
         <td>
-          ${b.status === 'pending' ? `<button class="act-btn approve" onclick="confirmBooking('${b._id}')"><i class="fas fa-check"></i> Confirm</button>` : ''}
-          ${b.status === 'confirmed' ? `<button class="act-btn blue" onclick="startCharging('${b._id}')"><i class="fas fa-play"></i> Start</button>` : ''}
-          ${b.status === 'in-progress' ? `<button class="act-btn approve" onclick="completeCharging('${b._id}')"><i class="fas fa-flag-checkered"></i> Complete</button>` : ''}
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${userInitial}</div>
+            <div>
+              <div style="font-weight:600;font-size:12.5px;">${userName}</div>
+              <div style="font-size:10px;color:var(--muted);">${userEmail}</div>
+            </div>
+          </div>
         </td>
-      </tr>`).join('');
+        <td>
+          <div style="font-weight:500;font-size:12px;">${stationName}</div>
+          ${stationAddr ? `<div style="font-size:10px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stationAddr}</div>` : ''}
+        </td>
+        <td style="font-size:11px;">
+          <div>${dateStr}</div>
+          <div style="font-size:10px;color:var(--muted);">${duration}${charger ? ' · ' + charger : ''}</div>
+        </td>
+        <td style="font-size:11px;">
+          <div>${vehicleNum || vehicleType}</div>
+          ${vehicleNum ? `<div style="font-size:10px;color:var(--muted);text-transform:capitalize;"><i class="fas fa-${vehicleType === 'bike' || vehicleType === 'scooter' ? 'motorcycle' : 'car'}" style="font-size:9px;margin-right:2px;"></i>${vehicleType}</div>` : ''}
+        </td>
+        <td style="color:var(--green);font-weight:600;">${amount}</td>
+        <td><span class="pill ${status}">${status}</span></td>
+        <td style="white-space:nowrap;">${actions}</td>
+      </tr>`;
+    }).join('');
   }
 
   async function loadBookings() {
     try {
       const data = await adminApiCall('/bookings');
       allBookings = data.bookings || [];
+      // Update stats
+      document.getElementById('s-total').textContent = allBookings.length;
+      document.getElementById('s-pending').textContent = allBookings.filter(b => b.status === 'pending').length;
+      document.getElementById('s-confirmed').textContent = allBookings.filter(b => b.status === 'confirmed').length;
+      document.getElementById('s-progress').textContent = allBookings.filter(b => b.status === 'in-progress').length;
+      document.getElementById('s-completed').textContent = allBookings.filter(b => b.status === 'completed').length;
+      document.getElementById('s-revenue').textContent = '₹' + allBookings.reduce((s, b) => s + (b.totalAmount || 0), 0);
       filterTable();
-    } catch(e) { document.getElementById('bookings-body').innerHTML = '<tr><td colspan="8"><div class="empty"><i class="fas fa-exclamation-triangle"></i>Failed to load — is backend running?</div></td></tr>'; }
+    } catch(e) { document.getElementById('bookings-body').innerHTML = '<tr><td colspan="7"><div class="empty"><i class="fas fa-exclamation-triangle"></i>Failed to load</div></td></tr>'; }
   }
 
   async function confirmBooking(id) {
@@ -167,6 +247,10 @@
   }
   async function completeCharging(id) {
     try { await adminApiCall(`/bookings/${id}/complete`, { method: 'PUT' }); showToast('Charging completed!'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
+  }
+  async function cancelBooking(id) {
+    if (!confirm('Cancel this booking?')) return;
+    try { await adminApiCall(`/bookings/${id}/cancel`, { method: 'PUT' }); showToast('Booking cancelled'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
   }
 
   loadBookings();

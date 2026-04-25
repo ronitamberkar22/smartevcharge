@@ -16,5 +16,7 @@ router.put('/password', auth, authController.changePassword);
 // Admin routes
 router.get('/users', adminAuth, authController.getAllUsers);
 router.put('/users/:id/toggle', adminAuth, authController.toggleUserStatus);
+router.put('/users/:id', adminAuth, authController.updateUser);
+router.delete('/users/:id', adminAuth, authController.deleteUser);
 
 module.exports = router;

@@ -7,6 +7,7 @@ const { auth, adminAuth } = require('../middleware/auth');
 // Public routes
 router.get('/', stationController.getAllStations);
 router.get('/nearby', stationController.getNearbyStations);
+router.post('/find-or-create', auth, stationController.findOrCreateStation);
 router.get('/:id', stationController.getStation);
 
 // Admin routes

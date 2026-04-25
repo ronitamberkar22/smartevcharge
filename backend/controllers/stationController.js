@@ -146,3 +146,40 @@ function calculateDistance(lat1, lng1, lat2, lng2) {
 function toRad(deg) {
   return deg * (Math.PI/180);
 }
+
+// Find or create station (for OSM/OCM live stations booked by users)
+exports.findOrCreateStation = async (req, res) => {
+  try {
+    const { name, address, latitude, longitude, pricePerHour, chargingSpeed, connectorTypes, source } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: 'Station name is required.' });
+    }
+
+    // Try to find by name first (case-insensitive)
+    let station = await Station.findOne({ name: { $regex: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') } });
+
+    if (station) {
+      return res.json({ station, created: false });
+    }
+
+    // Create new station from live data
+    station = new Station({
+      name: name.trim(),
+      address: address || 'Live Station',
+      latitude: latitude || 0,
+      longitude: longitude || 0,
+      totalSlots: 10,
+      availableSlots: 10,
+      pricePerHour: pricePerHour || 8,
+      chargingSpeed: chargingSpeed || 'fast',
+      connectorTypes: connectorTypes || ['CCS', 'Type2'],
+      status: 'active'
+    });
+
+    await station.save();
+    res.status(201).json({ station, created: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};

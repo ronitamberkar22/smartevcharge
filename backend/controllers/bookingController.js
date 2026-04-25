@@ -7,60 +7,68 @@ const Payment = require('../models/Payment');
 // Create booking
 exports.createBooking = async (req, res) => {
   try {
-    const { stationId, slotId, startTime, endTime, vehicleNumber, vehicleType, notes } = req.body;
-    
-    // Validate slot availability
-    const slot = await Slot.findById(slotId);
-    if (!slot || slot.status !== 'available') {
-      return res.status(400).json({ message: 'Slot is not available.' });
+    const { stationId, slotId, startTime, endTime, vehicleNumber, vehicleType, notes, duration: durationIn, chargerType } = req.body;
+    // Accept both 'station' and 'stationId' field names
+    const resolvedStationId = stationId || req.body.station;
+
+    if (!resolvedStationId) {
+      return res.status(400).json({ message: 'Station is required.' });
     }
 
-    // Check time conflicts
-    const conflictingBooking = await Booking.findOne({
-      slot: slotId,
-      status: { $in: ['pending', 'confirmed', 'in-progress'] },
-      $or: [
-        { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
-      ]
-    });
+    const station = await Station.findById(resolvedStationId);
+    if (!station) {
+      return res.status(404).json({ message: 'Station not found.' });
+    }
 
-    if (conflictingBooking) {
-      return res.status(400).json({ message: 'Slot is already booked for this time.' });
+    // Slot is optional — only validate if provided
+    let slot = null;
+    if (slotId) {
+      slot = await Slot.findById(slotId);
+      if (!slot || slot.status !== 'available') {
+        return res.status(400).json({ message: 'Slot is not available.' });
+      }
+      // Check time conflicts
+      const conflictingBooking = await Booking.findOne({
+        slot: slotId,
+        status: { $in: ['pending', 'confirmed', 'in-progress'] },
+        $or: [{ startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }]
+      });
+      if (conflictingBooking) {
+        return res.status(400).json({ message: 'Slot is already booked for this time.' });
+      }
     }
 
     // Calculate duration and amount
     const start = new Date(startTime);
     const end = new Date(endTime);
-    const duration = (end - start) / (1000 * 60 * 60); // hours
-    
-    const station = await Station.findById(stationId);
-    const totalAmount = duration * station.pricePerHour;
+    const durationHours = durationIn || ((end - start) / (1000 * 60 * 60));
+    const totalAmount = Math.round(durationHours * station.pricePerHour * 100) / 100;
 
-    // Create booking
+    // Create booking — status is 'confirmed' since payment is done in the same flow
     const booking = new Booking({
       user: req.user._id,
-      station: stationId,
-      slot: slotId,
+      station: resolvedStationId,
+      slot: slot ? slot._id : null,
       startTime: start,
       endTime: end,
-      duration: duration.toFixed(2),
-      totalAmount: Math.round(totalAmount * 100) / 100,
+      duration: durationHours,
+      totalAmount,
+      vehicleType: vehicleType || 'car',
       vehicleNumber,
-      vehicleType,
       notes,
-      status: 'pending'
+      status: 'confirmed'
     });
 
     await booking.save();
 
-    // Update slot status
-    slot.status = 'reserved';
-    slot.isAvailable = false;
-    await slot.save();
-
-    // Update station available slots
-    station.availableSlots = Math.max(0, station.availableSlots - 1);
-    await station.save();
+    // Update slot if provided
+    if (slot) {
+      slot.status = 'reserved';
+      slot.isAvailable = false;
+      await slot.save();
+      station.availableSlots = Math.max(0, station.availableSlots - 1);
+      await station.save();
+    }
 
     res.status(201).json({ message: 'Booking created.', booking });
   } catch (error) {
@@ -232,7 +240,7 @@ exports.getAllBookings = async (req, res) => {
 
     const bookings = await Booking.find(query)
       .populate('user', 'name email phone')
-      .populate('station', 'name address')
+      .populate('station', 'name address chargingSpeed pricePerHour connectorTypes')
       .populate('slot', 'slotNumber')
       .sort({ createdAt: -1 });
 

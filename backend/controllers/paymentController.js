@@ -6,7 +6,12 @@ const { v4: uuidv4 } = require('uuid');
 // Create payment for booking
 exports.createPayment = async (req, res) => {
   try {
-    const { bookingId, paymentMethod, paymentDetails } = req.body;
+    // Accept both 'bookingId' and 'booking' field names from frontend
+    const bookingId = req.body.bookingId || req.body.booking;
+    const paymentMethod = req.body.paymentMethod || req.body.method || 'upi';
+    const providedAmount = req.body.amount;
+    const providedTxnId = req.body.transactionId;
+    const paymentDetails = req.body.paymentDetails || {};
     
     // Find booking
     const booking = await Booking.findById(bookingId);
@@ -29,10 +34,11 @@ exports.createPayment = async (req, res) => {
     const payment = new Payment({
       booking: bookingId,
       user: req.user._id,
-      amount: booking.totalAmount,
-      paymentMethod: paymentMethod || 'card',
-      transactionId: `TXN-${uuidv4().substring(0, 8).toUpperCase()}`,
-      status: 'completed', // Simulated - in production, integrate with payment gateway
+      amount: providedAmount || booking.totalAmount,
+      paymentMethod: paymentMethod || 'upi',
+      transactionId: providedTxnId || `TXN-${uuidv4().substring(0, 8).toUpperCase()}`,
+      currency: 'INR',
+      status: 'completed',
       paymentDetails: {
         last4: paymentDetails?.cardNumber?.slice(-4),
         brand: paymentDetails?.cardBrand || 'Visa',
@@ -119,10 +125,11 @@ exports.getAllPayments = async (req, res) => {
     }
     
     const payments = await Payment.find(query)
+      .populate('user', 'name email phone')
       .populate({
         path: 'booking',
         populate: [
-          { path: 'station', select: 'name' },
+          { path: 'station', select: 'name address' },
           { path: 'user', select: 'name email' }
         ]
       })

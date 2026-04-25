@@ -15,7 +15,7 @@ const bookingSchema = new mongoose.Schema({
   slot: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Slot',
-    required: true
+    default: null
   },
   startTime: {
     type: Date,
