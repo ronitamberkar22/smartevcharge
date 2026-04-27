@@ -12,28 +12,29 @@
     h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
 
     /* Sidebar */
-    .sidebar{width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
-    .sb-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
+    .sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
+    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
     .logo-txt{font-size:19px;color:var(--green);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
     .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
-    .sb-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-    .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
-    .u-name{font-size:13px;font-weight:600;}.u-role{font-size:10px;color:var(--green);}
+    .sidebar-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+    .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
+    .user-name{font-size:13px;font-weight:600;}.user-role{font-size:10px;color:var(--green);}
     .nav{flex:1;padding:10px 0;overflow-y:auto;}
     .nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
     .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
     .nav-item:hover{color:var(--text);background:rgba(0,245,160,0.06);}
     .nav-item.active{color:var(--green);background:rgba(0,245,160,0.1);border-left-color:var(--green);}
     .nav-item i{width:16px;text-align:center;font-size:13px;}
-    .sb-bot{padding:14px 18px;border-top:1px solid var(--border);}
+    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
     .btn-logout{width:100%;padding:9px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
 
     /* Main */
-    .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
-    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-    .topbar h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
-    .topbar p{font-size:11px;color:var(--text2);margin-top:2px;}
-    .content{padding:24px 28px;max-width:900px;}
+    .main{margin-left:240px; width:calc(100% - 240px); display:flex; flex-direction:column; min-height:100vh;}
+    .topbar{background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;}
+    .topbar h3{font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700;}
+    .topbar h3 span{color:var(--green);}
+    .topbar p{font-size:11px; color:var(--text2); margin-top:2px;}
+    .content{padding:24px 28px; width:100%; max-width:none;}
 
     /* Hero banner */
     .hero-banner{background:linear-gradient(135deg,#0f1f18,#0a1628);border:1px solid rgba(0,245,160,.18);border-radius:16px;padding:28px;margin-bottom:22px;position:relative;overflow:hidden;}
@@ -53,8 +54,7 @@
     .stat-lbl{font-size:10px;color:var(--muted);margin-top:4px;}
 
     /* Reviews */
-    .sec-title{font-size:20px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
-    .sec-title i{color:var(--green);}
+    .sec-title{font-size:20px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
     .avg-badge{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;}
     .avg-stars{color:var(--yellow);letter-spacing:2px;}
 
@@ -92,32 +92,46 @@
 <div style="display:flex;min-height:100vh;">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="sb-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Charging Portal</div></div>
-    <div class="sb-user">
-      <div class="av" id="user-av">U</div>
-      <div><div class="u-name" id="user-name">User</div><div class="u-role">EV user</div></div>
+    <div class="sidebar-logo">
+      <div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div>
+      <div class="logo-sub">Charging Portal</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">U</div>
+      <div>
+        <div class="user-name" id="user-name">User</div>
+        <div class="user-role">EV user</div>
+      </div>
     </div>
     <nav class="nav">
       <div class="nav-sec">Main</div>
       <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
       <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+      <div class="nav-sec">Booking</div>
+      <a class="nav-item" href="station-detail.html"><i class="fas fa-info-circle"></i> Station Details</a>
       <a class="nav-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+      <a class="nav-item" href="payment.html"><i class="fas fa-credit-card"></i> Payment</a>
+      <a class="nav-item" href="confirmation.html"><i class="fas fa-check-circle"></i> Confirmation</a>
       <div class="nav-sec">Account</div>
       <a class="nav-item" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
       <div class="nav-sec">More</div>
       <a class="nav-item active" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
     </nav>
-    <div class="sb-bot"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
   </aside>
 
   <!-- Main -->
   <main class="main">
     <div class="topbar">
-      <div><h3>About <span style="color:var(--green)">SmartEVCharge</span></h3><p>Powering India's Electric Vehicle Revolution</p></div>
+      <div class="topbar-left">
+        <h3>About <span>SmartEVCharge</span></h3>
+        <p>Powering India's Electric Vehicle Revolution</p>
+      </div>
     </div>
 
     <div class="content">
-
       <!-- Mission Banner -->
       <div class="hero-banner">
         <div class="hero-tagline"><i class="fas fa-leaf"></i> &nbsp;Our Mission</div>
@@ -152,7 +166,6 @@
       <div class="write-card">
         <div class="write-title">Write a Review</div>
         <div class="write-sub">Share your SmartEVCharge experience</div>
-        <!-- Star selector -->
         <div class="star-row" id="star-row">
           <span class="star-btn" data-v="1">★</span>
           <span class="star-btn" data-v="2">★</span>
@@ -163,7 +176,6 @@
         <textarea class="form-control" id="rev-text" placeholder="Tell us about your experience…"></textarea>
         <button class="btn-submit" onclick="submitReview()"><i class="fas fa-paper-plane"></i> Submit Review</button>
       </div>
-
     </div>
   </main>
 </div>
@@ -175,14 +187,19 @@
   if (!requireUserAuth()) throw new Error('auth');
   const usr = getUser();
   document.getElementById('user-name').textContent = usr.name || 'User';
-  document.getElementById('user-av').textContent = (usr.name || 'U').charAt(0).toUpperCase();
+  document.getElementById('user-avatar').textContent = (usr.name || 'U').charAt(0).toUpperCase();
   document.getElementById('logout-btn').onclick = () => { localStorage.clear(); window.location.href = 'login.html'; };
 
-  // ── Reviews stored in localStorage (shared across all users on this browser) ──
-  const STORE_KEY = 'smartev_reviews';
-
-  function getReviews() { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); }
-  function saveReviews(r) { localStorage.setItem(STORE_KEY, JSON.stringify(r)); }
+  // ── Reviews via API (Shared across all users) ──
+  async function fetchReviews() {
+    try {
+      const data = await apiCall('/reviews');
+      return data;
+    } catch (e) {
+      console.error('Failed to fetch reviews:', e);
+      return [];
+    }
+  }
 
   // ── Star selector ──
   let selectedStars = 0;
@@ -197,8 +214,8 @@
   }
 
   // ── Render reviews ──
-  function renderReviews() {
-    const reviews = getReviews();
+  async function renderReviews() {
+    const reviews = await fetchReviews();
     const list = document.getElementById('reviews-list');
     const avgEl = document.getElementById('avg-stars');
     const avgTxt = document.getElementById('avg-text');
@@ -215,17 +232,14 @@
     avgEl.textContent = '★'.repeat(filled) + '☆'.repeat(5 - filled);
     avgTxt.textContent = `${avg} (${reviews.length} review${reviews.length > 1 ? 's' : ''})`;
 
-    list.innerHTML = [...reviews].reverse().map(r => {
+    list.innerHTML = reviews.map(r => {
       const initials = (r.author || 'U').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
       const starsHtml = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
-      const dateStr = new Date(r.ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const dateStr = new Date(r.createdAt || r.ts).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
       return `<div class="review-card">
         <div class="rev-header">
           <div class="rev-av">${initials}</div>
-          <div>
-            <div class="rev-name">${r.author || 'Anonymous'}</div>
-            <div class="rev-date">${dateStr}</div>
-          </div>
+          <div><div class="rev-name">${r.author || 'Anonymous'}</div><div class="rev-date">${dateStr}</div></div>
           <div class="rev-stars">${starsHtml}</div>
         </div>
         <div class="rev-text">${r.text}</div>
@@ -234,27 +248,36 @@
   }
 
   // ── Submit review ──
-  function submitReview() {
+  async function submitReview() {
     const text = document.getElementById('rev-text').value.trim();
     if (!selectedStars) { showToast('Please select a star rating', 'warning'); return; }
     if (!text) { showToast('Please write your review', 'warning'); return; }
 
-    const reviews = getReviews();
-    reviews.push({
-      id: Date.now(),
-      author: usr.name || 'Anonymous',
-      stars: selectedStars,
-      text,
-      ts: new Date().toISOString(),
-    });
-    saveReviews(reviews);
-    renderReviews();
+    const btn = document.querySelector('.btn-submit');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting…';
 
-    // Reset form
-    document.getElementById('rev-text').value = '';
-    selectedStars = 0;
-    highlightStars(0);
-    showToast('Review submitted! Thank you 🎉', 'success');
+    try {
+      await apiCall('/reviews', {
+        method: 'POST',
+        body: JSON.stringify({
+          author: usr.name || 'Anonymous',
+          stars: selectedStars,
+          text
+        })
+      });
+      
+      await renderReviews();
+      document.getElementById('rev-text').value = '';
+      selectedStars = 0; highlightStars(0);
+      showToast('Review submitted! Thank you 🎉', 'success');
+    } catch (error) {
+      showToast('Failed to submit review. Try again later.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
   }
 
   function showToast(msg, type = 'info') {
@@ -267,7 +290,6 @@
     el.classList.add('show'); clearTimeout(el._t);
     el._t = setTimeout(() => el.classList.remove('show'), 3500);
   }
-
   renderReviews();
 </script>
 </body>

@@ -1,497 +1,787 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SmartEVCharge — Secure Payment</title>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root{--bg:#0a0a0f;--bg2:#111118;--card:#16161f;--card2:#1c1c28;--green:#00f5a0;--blue:#00d4ff;--purple:#a855f7;--orange:#ff6b35;--text:#f0f0f5;--text2:#9090a8;--muted:#5a5a72;--border:rgba(0,245,160,0.12);--sw:240px;--glow:0 0 24px rgba(0,245,160,0.28);--red:#ff4d6d;--yellow:#ffd166;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-    h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #111118;
+      --card: #16161f;
+      --card2: #1c1c28;
+      --green: #00f5a0;
+      --blue: #00d4ff;
+      --purple: #a855f7;
+      --orange: #ff6b35;
+      --text: #f0f0f5;
+      --text2: #9090a8;
+      --muted: #5a5a72;
+      --border: rgba(0, 245, 160, 0.12);
+      --sw: 240px;
+      --glow: 0 0 24px rgba(0, 245, 160, 0.28);
+      --red: #ff4d6d;
+      --yellow: #ffd166;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Rajdhani', sans-serif; }
+    a { text-decoration: none; color: inherit; }
 
     /* Sidebar */
-    .sidebar{width:var(--sw);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
-    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-    .logo-txt{font-size:19px;color:var(--green);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
-    .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
-    .sidebar-user{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-    .user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--blue));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#0a0a0f;flex-shrink:0;}
-    .user-name{font-size:13px;font-weight:600;}.user-role{font-size:10px;color:var(--green);}
-    .nav{flex:1;padding:10px 0;overflow-y:auto;}
-    .nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
-    .nav-item:hover{color:var(--text);background:rgba(0,245,160,0.06);}
-    .nav-item.active{color:var(--green);background:rgba(0,245,160,0.1);border-left-color:var(--green);}
-    .nav-item i{width:16px;text-align:center;font-size:13px;}
-    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
-    .btn-logout{width:100%;padding:9px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
-    .btn-logout:hover{background:rgba(255,77,109,0.2);}
+    .sidebar {
+      width: var(--sw);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+
+    .logo-txt {
+      font-size: 19px;
+      color: var(--green);
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-sub {
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .sidebar-user {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+      color: #0a0a0f; flex-shrink: 0;
+    }
+
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-role { font-size: 10px; color: var(--green); }
+
+    .nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+
+    .nav-sec {
+      padding: 8px 18px 4px; font-size: 9px; color: var(--muted);
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 18px;
+      color: var(--text2); font-size: 13px; font-weight: 500;
+      transition: .18s; border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(0, 245, 160, 0.06); }
+    .nav-item.active { color: var(--green); background: rgba(0, 245, 160, 0.1); border-left-color: var(--green); }
+    .nav-item i { width: 16px; text-align: center; font-size: 13px; }
+
+    .sidebar-bottom { padding: 14px 18px; border-top: 1px solid var(--border); }
+
+    .btn-logout {
+      width: 100%; padding: 9px;
+      background: rgba(255, 77, 109, 0.1); border: 1px solid rgba(255, 77, 109, 0.2);
+      border-radius: 8px; color: var(--red); font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    .btn-logout:hover { background: rgba(255, 77, 109, 0.2); }
 
     /* Main */
-    .main{margin-left:var(--sw);display:flex;flex-direction:column;min-height:100vh;}
-    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-    .topbar-left h3{font-size:20px;font-weight:700;}
-    .topbar-left p{font-size:11px;color:var(--text2);margin-top:2px;}
-    .step-bar{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
-    .step{padding:3px 12px;border-radius:12px;font-size:11px;}
-    .step.done{background:rgba(0,245,160,0.1);color:var(--green);}
-    .step.active{background:var(--green);color:#0a0a0f;font-weight:700;}
-    .step-sep{color:var(--muted);}
+    .main{margin-left:240px; width:calc(100% - 240px); display:flex; flex-direction:column; min-height:100vh; flex:1;}
+    .topbar{background:var(--bg2); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;}
+    .topbar h3{font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700;}
+    .topbar h3 span{color:var(--green);}
+    .topbar p{font-size:11px; color:var(--text2); margin-top:2px;}
+    .content{padding:24px 28px; width:100%; max-width:none;}
 
-    .content{padding:24px 28px;max-width:1100px;}
-    .grid2{display:grid;grid-template-columns:1fr 380px;gap:22px;}
-    @media(max-width:900px){.grid2{grid-template-columns:1fr;}}
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media(max-width:900px) { .grid2 { grid-template-columns: 1fr; } }
 
     /* Cards */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;}
-    .card-title{font-size:16px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-    .card-title i{color:var(--green);font-size:14px;}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 18px;
+    }
 
     /* Payment options */
-    .pay-methods{display:flex;flex-direction:column;gap:10px;}
-    .pay-opt{display:flex;align-items:center;gap:14px;padding:14px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:.2s;position:relative;}
-    .pay-opt:hover{border-color:rgba(0,245,160,0.35);background:rgba(0,245,160,0.03);}
-    .pay-opt.selected{border-color:var(--green);background:rgba(0,245,160,0.07);}
-    .pay-opt.selected::after{content:'✓';position:absolute;right:14px;top:50%;transform:translateY(-50%);width:22px;height:22px;background:var(--green);border-radius:50%;color:#0a0a0f;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:22px;text-align:center;}
-    .pay-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-    .pay-name{font-size:14px;font-weight:600;margin-bottom:2px;}
-    .pay-desc{font-size:11px;color:var(--text2);}
+    .pay-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-    /* UPI */
-    .upi-panel{display:none;margin-top:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
-    .upi-panel.open{display:block;}
-    .qr-wrap{width:130px;height:130px;background:#fff;border-radius:10px;padding:10px;margin:0 auto 12px;}
-    .qr-wrap svg{width:100%;height:100%;}
-    .upi-id{font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px;}
-    .upi-apps{display:flex;justify-content:center;gap:12px;margin-top:10px;}
-    .upi-apps img{height:28px;opacity:.85;filter:brightness(1.1);}
+    .pay-opt {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .2s;
+      position: relative;
+    }
+
+    .pay-opt:hover {
+      border-color: rgba(0, 245, 160, 0.3);
+      background: rgba(0, 245, 160, 0.02);
+    }
+
+    .pay-opt.selected {
+      border-color: var(--green);
+      background: rgba(0, 245, 160, 0.06);
+    }
+
+    .pay-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+
+    .pay-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .pay-desc { font-size: 11px; color: var(--text2); }
+
+    /* UPI panel */
+    .upi-panel {
+      display: none;
+      margin-top: 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .upi-panel.open { display: block; }
+
+    .qr-wrap {
+      width: 110px; height: 110px;
+      background: #fff; border-radius: 10px;
+      padding: 8px; margin: 0 auto 12px;
+    }
+
+    .qr-wrap svg { width: 100%; height: 100%; }
+
+    .upi-id { font-size: 13px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
 
     /* Card fields */
-    .card-panel{display:none;margin-top:14px;}
-    .card-panel.open{display:block;}
-    .form-group{margin-bottom:14px;}
-    .form-group label{display:block;font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
-    .form-control{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:.2s;}
-    .form-control:focus{border-color:var(--green);}
-    .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .card-panel { display: none; margin-top: 14px; }
+    .card-panel.open { display: block; }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group label {
+      display: block; font-size: 10px; color: var(--text2);
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 13px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: .2s;
+    }
+
+    .form-control:focus { border-color: var(--green); }
+
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
     /* Net banking */
-    .net-banks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
-    .bank-btn{padding:10px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:11px;cursor:pointer;text-align:center;transition:.2s;}
-    .bank-btn:hover{border-color:var(--orange);color:var(--orange);}
-    .bank-btn.selected{border-color:var(--orange);background:rgba(255,107,53,0.08);color:var(--orange);}
+    .net-banks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .bank-btn {
+      padding: 10px 8px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text2);
+      font-size: 11px;
+      cursor: pointer;
+      text-align: center;
+      transition: .2s;
+    }
+
+    .bank-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+    .bank-btn.selected {
+      border-color: var(--orange);
+      background: rgba(255, 107, 53, 0.08);
+      color: var(--orange);
+    }
 
     /* Summary card */
-    .summary-card{background:var(--card);border:1px solid rgba(0,245,160,0.2);border-radius:14px;padding:22px;box-shadow:0 0 28px rgba(0,245,160,0.05);position:sticky;top:76px;}
-    .summary-title{font-size:16px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-    .summary-title i{color:var(--green);}
-    .s-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;}
-    .s-row:last-of-type{border-bottom:none;}
-    .s-lbl{color:var(--text2);}
-    .s-val{font-weight:500;}
-    .s-total{display:flex;justify-content:space-between;align-items:center;padding:14px 0 0;margin-top:4px;border-top:1px solid rgba(0,245,160,0.15);}
-    .s-total-lbl{font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:700;}
-    .s-total-val{font-size:24px;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--green);}
+    .summary-card {
+      background: var(--card);
+      border: 1px solid rgba(0, 245, 160, 0.18);
+      border-radius: 14px;
+      padding: 22px;
+      position: sticky;
+      top: 76px;
+    }
 
-    /* Station info chip in summary */
-    .station-chip{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
-    .station-chip i{color:var(--green);font-size:16px;}
-    .station-chip-name{font-size:13px;font-weight:600;}
-    .station-chip-addr{font-size:11px;color:var(--text2);}
+    .summary-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 18px;
+    }
+
+    .s-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+    }
+
+    .s-row:last-of-type { border-bottom: none; }
+    .s-lbl { color: var(--text2); }
+    .s-val { font-weight: 500; }
+
+    .s-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0 0;
+      margin-top: 4px;
+      border-top: 1px solid rgba(0, 245, 160, 0.15);
+    }
+
+    .s-total-lbl { font-size: 16px; font-family: 'Rajdhani', sans-serif; font-weight: 700; }
+
+    .s-total-val {
+      font-size: 22px; font-family: 'Rajdhani', sans-serif;
+      font-weight: 700; color: var(--green);
+    }
 
     /* Pay button */
-    .btn-pay{width:100%;padding:16px;background:linear-gradient(135deg,var(--green),#00c896);border:none;border-radius:12px;color:#0a0a0f;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-top:16px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-    .btn-pay:hover:not(:disabled){box-shadow:var(--glow);transform:translateY(-1px);}
-    .btn-pay:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-    .security-note{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .btn-pay {
+      width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--green), #00c896);
+      border: none; border-radius: 12px;
+      color: #0a0a0f; font-family: 'Rajdhani', sans-serif;
+      font-size: 18px; font-weight: 700; letter-spacing: 1px;
+      cursor: pointer; margin-top: 16px; transition: .2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-pay:hover:not(:disabled) { box-shadow: var(--glow); transform: translateY(-1px); }
+    .btn-pay:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .security-note {
+      font-size: 11px; color: var(--muted); text-align: center;
+      margin-top: 10px; display: flex; align-items: center;
+      justify-content: center; gap: 5px;
+    }
 
     /* Wallet balance */
-    .wallet-balance{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;}
-    .w-lbl{font-size:12px;color:var(--text2);}
-    .w-val{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--purple);}
+    .wallet-balance {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-    /* Spinner */
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .spinner{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(10,10,15,0.3);border-top-color:#0a0a0f;border-radius:50%;animation:spin .7s linear infinite;}
+    .w-lbl { font-size: 12px; color: var(--text2); }
+
+    .w-val {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--purple);
+    }
 
     /* Toast */
-    .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid rgba(0,212,255,0.18);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(160%);opacity:0;transition:.35s cubic-bezier(.34,1.56,.64,1);max-width:360px;}
-    .toast.show{transform:translateX(0);opacity:1;}
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--card2); border: 1px solid rgba(0, 212, 255, 0.18);
+      border-radius: 12px; padding: 12px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; z-index: 9999;
+      transform: translateX(160%); opacity: 0;
+      transition: .35s cubic-bezier(.34, 1.56, .64, 1);
+      max-width: 360px;
+    }
 
-    /* No context banner */
-    .no-ctx{margin:40px auto;max-width:500px;text-align:center;padding:40px;background:var(--card);border:1px solid var(--border);border-radius:16px;}
-    .no-ctx i{font-size:36px;color:var(--muted);margin-bottom:14px;display:block;}
+    .toast.show { transform: translateX(0); opacity: 1; }
+
+    /* No context */
+    .no-ctx {
+      margin: 40px auto; max-width: 500px; text-align: center;
+      padding: 40px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 16px;
+    }
+
+    .no-ctx i { font-size: 36px; color: var(--muted); margin-bottom: 14px; display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg) } }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2.5px solid rgba(10, 10, 15, 0.3);
+      border-top-color: #0a0a0f; border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .breadcrumb .step.done { color: var(--green); }
+    .breadcrumb .step.active { color: var(--green); background: rgba(0, 245, 160, 0.1); padding: 4px 10px; border-radius: 20px; }
+    .breadcrumb .sep { color: var(--muted); opacity: 0.5; font-size: 10px; }
+
+    .content { padding: 24px 28px; width: 100%; }
   </style>
 </head>
+
 <body>
-<div style="display:flex;min-height:100vh;">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Charging Portal</div></div>
-    <div class="sidebar-user">
-      <div class="user-avatar" id="user-avatar">U</div>
-      <div><div class="user-name" id="user-name">User</div><div class="user-role">EV user</div></div>
-    </div>
-    <nav class="nav">
-      <div class="nav-sec">Main</div>
-      <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
-      <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
-      <a class="nav-item active" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
-      <div class="nav-sec">Account</div>
-      <a class="nav-item" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
-      <div class="nav-sec">More</div>
-      <a class="nav-item" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
-    </nav>
-    <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
-  </aside>
-
-  <!-- Main -->
-  <main class="main">
-    <div class="topbar">
-      <div class="topbar-left"><h3><i class="fas fa-lock" style="color:var(--green);font-size:16px;margin-right:6px;"></i>Secure Payment</h3><p>Step 3 of 3 — Complete your booking</p></div>
-      <div class="step-bar">
-        <span class="step done"><i class="fas fa-check"></i> Station</span>
-        <span class="step-sep">›</span>
-        <span class="step done"><i class="fas fa-check"></i> Slot</span>
-        <span class="step-sep">›</span>
-        <span class="step active">Payment</span>
+  <div style="display:flex;min-height:100vh;">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div>
+        <div class="logo-sub">Charging Portal</div>
       </div>
-    </div>
-
-    <div class="content">
-      <div class="grid2" id="pay-grid">
-        <!-- LEFT: Payment methods -->
+      <div class="sidebar-user">
+        <div class="user-avatar" id="user-avatar">U</div>
         <div>
-          <div class="card">
-            <div class="card-title"><i class="fas fa-credit-card"></i> Choose Payment Method</div>
+          <div class="user-name" id="user-name">User</div>
+          <div class="user-role">EV user</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <div class="nav-sec">Main</div>
+        <a class="nav-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a class="nav-item" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
+        <div class="nav-sec">Booking</div>
+        <a class="nav-item" href="station-detail.html"><i class="fas fa-info-circle"></i> Station Details</a>
+        <a class="nav-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
+        <a class="nav-item active" href="payment.html"><i class="fas fa-credit-card"></i> Payment</a>
+        <a class="nav-item" href="confirmation.html"><i class="fas fa-check-circle"></i> Confirmation</a>
+        <div class="nav-sec">Account</div>
+        <a class="nav-item" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
+        <div class="nav-sec">More</div>
+        <a class="nav-item" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
+      </nav>
+      <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i>
+          Logout</button></div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-left">
+          <h3><span>Secure</span> Payment</h3>
+          <p>Complete your booking with a secure payment method</p>
+        </div>
+        <div class="breadcrumb">
+          <span class="step done" title="Station"><i class="fas fa-check-circle"></i></span>
+          <span class="sep"><i class="fas fa-chevron-right"></i></span>
+          <span class="step done" title="Slot"><i class="fas fa-check-circle"></i></span>
+          <span class="sep"><i class="fas fa-chevron-right"></i></span>
+          <span class="step active" title="Payment"><i class="fas fa-credit-card"></i></span>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid2" id="pay-grid">
+          <!-- LEFT: Payment methods -->
+          <div>
+            <div class="card-title">Payment Method</div>
             <div class="pay-methods" id="pay-methods">
 
               <!-- UPI -->
               <div class="pay-opt selected" id="opt-upi" onclick="selectPay('upi')">
-                <div class="pay-icon" style="background:rgba(0,245,160,0.12);color:var(--green);"><i class="fas fa-mobile-screen-button"></i></div>
-                <div><div class="pay-name">UPI / QR Code</div><div class="pay-desc">PhonePe · GPay · Paytm · BHIM</div></div>
-              </div>
-              <!-- UPI panel -->
-              <div class="upi-panel open" id="upi-panel">
-                <div class="qr-wrap">
-                  <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="0" y="0" width="30" height="30" rx="2" fill="#000"/>
-                    <rect x="5" y="5" width="20" height="20" rx="1" fill="white"/>
-                    <rect x="9" y="9" width="12" height="12" fill="#000"/>
-                    <rect x="50" y="0" width="30" height="30" rx="2" fill="#000"/>
-                    <rect x="55" y="5" width="20" height="20" rx="1" fill="white"/>
-                    <rect x="59" y="9" width="12" height="12" fill="#000"/>
-                    <rect x="0" y="50" width="30" height="30" rx="2" fill="#000"/>
-                    <rect x="5" y="55" width="20" height="20" rx="1" fill="white"/>
-                    <rect x="9" y="59" width="12" height="12" fill="#000"/>
-                    <rect x="35" y="35" width="8" height="8" fill="#000"/>
-                    <rect x="47" y="35" width="8" height="8" fill="#000"/>
-                    <rect x="35" y="47" width="8" height="8" fill="#000"/>
-                    <rect x="47" y="47" width="8" height="8" fill="#000"/>
-                    <rect x="60" y="40" width="5" height="5" fill="#000"/>
-                    <rect x="67" y="47" width="5" height="5" fill="#000"/>
-                    <rect x="40" y="60" width="5" height="5" fill="#000"/>
-                    <rect x="55" y="65" width="5" height="5" fill="#000"/>
-                  </svg>
-                </div>
-                <div class="upi-id">smartevcharge@upi</div>
-                <p style="font-size:12px;color:var(--text2);">Scan with any UPI app · Amount auto-filled</p>
-                <div class="upi-apps">
-                  <img src="https://img.icons8.com/color/48/google-pay-india.png" alt="GPay">
-                  <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm">
-                  <img src="https://img.icons8.com/color/48/bhim.png" alt="BHIM">
-                  <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe">
-                </div>
-                <div style="margin-top:14px;">
-                  <label style="font-size:10px;color:var(--text2);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px;">Or enter UPI ID</label>
-                  <input type="text" class="form-control" id="upi-id-input" placeholder="you@upi" style="text-align:center;">
+                <div class="pay-icon" style="background:rgba(0,245,160,0.12);color:var(--green);"><i
+                    class="fas fa-mobile-screen-button"></i></div>
+                <div>
+                  <div class="pay-name">UPI / QR Code</div>
+                  <div class="pay-desc">PhonePe, GPay, Paytm, BHIM</div>
                 </div>
               </div>
 
               <!-- Card -->
               <div class="pay-opt" id="opt-card" onclick="selectPay('card')">
-                <div class="pay-icon" style="background:rgba(0,212,255,0.12);color:var(--blue);"><i class="fas fa-credit-card"></i></div>
-                <div><div class="pay-name">Debit / Credit Card</div><div class="pay-desc">Visa · Mastercard · RuPay · Amex</div></div>
-              </div>
-              <div class="card-panel" id="card-panel">
-                <div class="form-group"><label>Card Number</label><input type="text" class="form-control" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div>
-                <div class="row2">
-                  <div class="form-group"><label>Expiry (MM/YY)</label><input type="text" class="form-control" id="card-exp" placeholder="MM/YY" maxlength="5"></div>
-                  <div class="form-group"><label>CVV</label><input type="password" class="form-control" id="card-cvv" placeholder="•••" maxlength="4"></div>
+                <div class="pay-icon" style="background:rgba(0,212,255,0.12);color:var(--blue);"><i
+                    class="fas fa-credit-card"></i></div>
+                <div>
+                  <div class="pay-name">Debit / Credit Card</div>
+                  <div class="pay-desc">Visa, Mastercard, RuPay</div>
                 </div>
-                <div class="form-group"><label>Name on Card</label><input type="text" class="form-control" id="card-name" placeholder="FULL NAME"></div>
               </div>
 
               <!-- Wallet -->
               <div class="pay-opt" id="opt-wallet" onclick="selectPay('wallet')">
-                <div class="pay-icon" style="background:rgba(168,85,247,0.12);color:var(--purple);"><i class="fas fa-wallet"></i></div>
-                <div><div class="pay-name">SmartEV Wallet</div><div class="pay-desc">Instant deduction · No extra charges</div></div>
-              </div>
-              <div class="card-panel" id="wallet-panel">
-                <div class="wallet-balance">
-                  <div><div class="w-lbl">Available Balance</div><div class="w-val">₹450.00</div></div>
-                  <i class="fas fa-shield-halved" style="color:var(--purple);font-size:20px;"></i>
+                <div class="pay-icon" style="background:rgba(168,85,247,0.12);color:var(--purple);"><i
+                    class="fas fa-wallet"></i></div>
+                <div>
+                  <div class="pay-name">SmartEV Wallet</div>
+                  <div class="pay-desc">Balance: ₹450.00</div>
                 </div>
               </div>
 
               <!-- Net Banking -->
               <div class="pay-opt" id="opt-net" onclick="selectPay('net')">
-                <div class="pay-icon" style="background:rgba(255,107,53,0.12);color:var(--orange);"><i class="fas fa-university"></i></div>
-                <div><div class="pay-name">Net Banking</div><div class="pay-desc">All major Indian banks</div></div>
-              </div>
-              <div class="card-panel" id="net-panel">
-                <div class="net-banks">
-                  <div class="bank-btn" onclick="selectBank(this,'SBI')">SBI</div>
-                  <div class="bank-btn" onclick="selectBank(this,'HDFC')">HDFC</div>
-                  <div class="bank-btn" onclick="selectBank(this,'ICICI')">ICICI</div>
-                  <div class="bank-btn" onclick="selectBank(this,'Axis')">Axis</div>
-                  <div class="bank-btn" onclick="selectBank(this,'Kotak')">Kotak</div>
-                  <div class="bank-btn" onclick="selectBank(this,'BOB')">Bank of Baroda</div>
+                <div class="pay-icon" style="background:rgba(255,107,53,0.12);color:var(--orange);"><i
+                    class="fas fa-university"></i></div>
+                <div>
+                  <div class="pay-name">Net Banking</div>
+                  <div class="pay-desc">All major banks supported</div>
                 </div>
               </div>
-
             </div>
-          </div>
-        </div>
 
-        <!-- RIGHT: Order summary -->
-        <div>
-          <div class="summary-card">
-            <div class="summary-title"><i class="fas fa-receipt"></i> Order Summary</div>
+            <!-- UPI panel -->
+            <div class="upi-panel open" id="upi-panel">
+              <div class="qr-wrap">
+                <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0" y="0" width="30" height="30" rx="2" fill="#000" />
+                  <rect x="5" y="5" width="20" height="20" rx="1" fill="white" />
+                  <rect x="9" y="9" width="12" height="12" fill="#000" />
+                  <rect x="50" y="0" width="30" height="30" rx="2" fill="#000" />
+                  <rect x="55" y="5" width="20" height="20" rx="1" fill="white" />
+                  <rect x="59" y="9" width="12" height="12" fill="#000" />
+                  <rect x="0" y="50" width="30" height="30" rx="2" fill="#000" />
+                  <rect x="5" y="55" width="20" height="20" rx="1" fill="white" />
+                  <rect x="9" y="59" width="12" height="12" fill="#000" />
+                  <rect x="35" y="35" width="8" height="8" fill="#000" />
+                  <rect x="47" y="35" width="8" height="8" fill="#000" />
+                  <rect x="35" y="47" width="8" height="8" fill="#000" />
+                  <rect x="47" y="47" width="8" height="8" fill="#000" />
+                  <rect x="60" y="40" width="5" height="5" fill="#000" />
+                  <rect x="67" y="47" width="5" height="5" fill="#000" />
+                  <rect x="40" y="60" width="5" height="5" fill="#000" />
+                  <rect x="55" y="65" width="5" height="5" fill="#000" />
+                </svg>
+              </div>
+              <div class="upi-id">smartevcharge@upi</div>
+              <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Scan with any UPI app</p>
+              <div style="display:flex;justify-content:center;gap:12px;margin-bottom:16px;opacity:0.8;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo.png" height="12" alt="UPI">
+                <i class="fab fa-google-pay"></i>
+                <i class="fab fa-amazon-pay"></i>
+                <i class="fas fa-mobile-button"></i>
+              </div>
+              <input type="text" class="form-control" id="upi-id-input" placeholder="you@upi"
+                style="text-align:center;">
+            </div>
 
-            <div class="station-chip">
-              <i class="fas fa-charging-station"></i>
-              <div>
-                <div class="station-chip-name" id="sum-station">—</div>
-                <div class="station-chip-addr" id="sum-addr">—</div>
+            <!-- Card panel -->
+            <div class="card-panel" id="card-panel">
+              <div class="form-group"><label>Card Number</label><input type="text" class="form-control"
+                  id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)"></div>
+              <div class="row2">
+                <div class="form-group"><label>Expiry (MM/YY)</label><input type="text" class="form-control"
+                    id="card-exp" placeholder="MM/YY" maxlength="5"></div>
+                <div class="form-group"><label>CVV</label><input type="password" class="form-control" id="card-cvv"
+                    placeholder="•••" maxlength="4"></div>
+              </div>
+              <div class="form-group"><label>Name on Card</label><input type="text" class="form-control"
+                  id="card-name" placeholder="FULL NAME"></div>
+            </div>
+
+            <!-- Wallet panel -->
+            <div class="card-panel" id="wallet-panel">
+              <div class="wallet-balance">
+                <div>
+                  <div class="w-lbl">Available Balance</div>
+                  <div class="w-val">₹450.00</div>
+                </div>
+                <i class="fas fa-shield-halved" style="color:var(--purple);font-size:20px;"></i>
               </div>
             </div>
 
-            <div class="s-row"><span class="s-lbl">Date</span><span class="s-val" id="sum-date">—</span></div>
-            <div class="s-row"><span class="s-lbl">Time Slot</span><span class="s-val" id="sum-slot">—</span></div>
-            <div class="s-row"><span class="s-lbl">Charger</span><span class="s-val" id="sum-charger">—</span></div>
-            <div class="s-row"><span class="s-lbl">Duration</span><span class="s-val">1 hour</span></div>
-            <div class="s-row"><span class="s-lbl">Charging Cost</span><span class="s-val" id="sum-base">₹0</span></div>
-            <div class="s-row"><span class="s-lbl">Platform Fee</span><span class="s-val">₹5</span></div>
-            <div class="s-row"><span class="s-lbl">GST (18%)</span><span class="s-val" id="sum-gst">₹0</span></div>
-
-            <div class="s-total">
-              <div class="s-total-lbl">Total Payable</div>
-              <div class="s-total-val" id="sum-total">₹0</div>
+            <!-- Net banking panel -->
+            <div class="card-panel" id="net-panel">
+              <div class="net-banks">
+                <div class="bank-btn" onclick="selectBank(this,'SBI')">SBI</div>
+                <div class="bank-btn" onclick="selectBank(this,'HDFC')">HDFC</div>
+                <div class="bank-btn" onclick="selectBank(this,'ICICI')">ICICI</div>
+                <div class="bank-btn" onclick="selectBank(this,'Axis')">Axis</div>
+                <div class="bank-btn" onclick="selectBank(this,'Kotak')">Kotak</div>
+                <div class="bank-btn" onclick="selectBank(this,'BOB')">Bank of Baroda</div>
+              </div>
             </div>
+          </div>
 
-            <button class="btn-pay" id="pay-btn" onclick="doPayment()">
-              <i class="fas fa-lock"></i> PAY NOW
-            </button>
-            <div class="security-note"><i class="fas fa-shield-halved"></i> 256-bit SSL · PCI DSS Compliant · Secure</div>
+          <!-- RIGHT: Order summary -->
+          <div>
+            <div class="summary-card">
+              <div class="summary-title">Order Summary</div>
+
+              <div class="s-row"><span class="s-lbl">Station</span><span class="s-val" id="sum-station">—</span></div>
+              <div class="s-row"><span class="s-lbl">Date & Slot</span><span class="s-val" id="sum-slot">—</span></div>
+              <div class="s-row"><span class="s-lbl">Charger Type</span><span class="s-val" id="sum-charger">—</span></div>
+              <div class="s-row"><span class="s-lbl">Duration</span><span class="s-val">1 hour</span></div>
+              <div class="s-row"><span class="s-lbl">Charging Cost</span><span class="s-val" id="sum-base">₹0</span></div>
+              <div class="s-row"><span class="s-lbl">Platform Fee</span><span class="s-val">₹5</span></div>
+              <div class="s-row"><span class="s-lbl">GST (18%)</span><span class="s-val" id="sum-gst">₹0</span></div>
+
+              <div class="s-total">
+                <div class="s-total-lbl">Total</div>
+                <div class="s-total-val" id="sum-total">₹0</div>
+              </div>
+
+              <button class="btn-pay" id="pay-btn" onclick="doPayment()">
+                <i class="fas fa-lock"></i> PAY NOW
+              </button>
+              <div class="security-note"><i class="fas fa-shield-halved"></i> 256-bit SSL secured · PCI DSS compliant</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
-</div>
+    </main>
+  </div>
 
-<div class="toast" id="toast"><i id="toast-icon" class="fas fa-circle-info"></i><span id="toast-msg"></span></div>
+  <div class="toast" id="toast"><i id="toast-icon" class="fas fa-circle-info"></i><span id="toast-msg"></span></div>
 
-<script src="/shared/api.js"></script>
-<script>
-  // ── Auth ──────────────────────────────────────────
-  if (!requireUserAuth()) throw new Error('Not authenticated');
-  const user = getUser();
-  document.getElementById('user-name').textContent = user.name || 'User';
-  document.getElementById('user-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
-  document.getElementById('logout-btn').onclick = () => {
-    sessionStorage.removeItem('confirmationData');
-    sessionStorage.removeItem('bookingContext');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = 'login.html';
-  };
+  <script src="/shared/api.js"></script>
+  <script>
+    // ── Auth ──────────────────────────────────────────
+    if (!requireUserAuth()) throw new Error('Not authenticated');
+    const user = getUser();
+    document.getElementById('user-name').textContent = user.name || 'User';
+    document.getElementById('user-avatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+    document.getElementById('logout-btn').onclick = () => {
+      sessionStorage.removeItem('confirmationData');
+      sessionStorage.removeItem('bookingContext');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = 'login.html';
+    };
 
-  // ── Load booking context ───────────────────────────
-  const ctx = JSON.parse(sessionStorage.getItem('bookingContext') || '{}');
-  if (!ctx.stationId) {
-    // No booking in progress — redirect back
-    sessionStorage.removeItem('bookingContext');
-    window.location.href = 'booking.html';
-  }
-
-  // Populate summary
-  document.getElementById('sum-station').textContent = ctx.stationName || '—';
-  document.getElementById('sum-addr').textContent = ctx.stationAddr || 'EV Charging Station';
-  document.getElementById('sum-date').textContent = ctx.date ? new Date(ctx.date).toLocaleDateString('en-IN', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }) : '—';
-  document.getElementById('sum-slot').textContent = ctx.slot || '—';
-  document.getElementById('sum-charger').textContent = ctx.charger || '—';
-
-  const base = Number(ctx.price) || 0;
-  const gst  = Math.round(base * 0.18);
-  const fee  = 5;
-  const total = base + gst + fee;
-  document.getElementById('sum-base').textContent  = '₹' + base;
-  document.getElementById('sum-gst').textContent   = '₹' + gst;
-  document.getElementById('sum-total').textContent = '₹' + total;
-
-  // ── Payment method ─────────────────────────────────
-  let payMethod = 'upi';
-  let selectedBank = '';
-
-  function selectPay(m) {
-    payMethod = m;
-    // Highlight selected
-    document.querySelectorAll('.pay-opt').forEach(el => el.classList.remove('selected'));
-    document.getElementById('opt-' + m).classList.add('selected');
-    // Show/hide panels
-    document.getElementById('upi-panel').classList.toggle('open', m === 'upi');
-    document.getElementById('card-panel').classList.toggle('open', m === 'card');
-    document.getElementById('wallet-panel').classList.toggle('open', m === 'wallet');
-    document.getElementById('net-panel').classList.toggle('open', m === 'net');
-  }
-
-  function selectBank(el, bank) {
-    selectedBank = bank;
-    document.querySelectorAll('.bank-btn').forEach(b => b.classList.remove('selected'));
-    el.classList.add('selected');
-  }
-
-  function fmtCard(input) {
-    let v = input.value.replace(/\D/g, '').substring(0, 16);
-    input.value = v.replace(/(.{4})/g, '$1 ').trim();
-  }
-
-  // ── Validate before paying ─────────────────────────
-  function validate() {
-    if (payMethod === 'card') {
-      const num = document.getElementById('card-num').value.replace(/\s/g, '');
-      const exp = document.getElementById('card-exp').value;
-      const cvv = document.getElementById('card-cvv').value;
-      if (num.length < 16) { showToast('Enter a valid 16-digit card number', 'error'); return false; }
-      if (!/^\d{2}\/\d{2}$/.test(exp)) { showToast('Enter expiry as MM/YY', 'error'); return false; }
-      if (cvv.length < 3) { showToast('Enter a valid CVV', 'error'); return false; }
+    // ── Load booking context ───────────────────────────
+    const ctx = JSON.parse(sessionStorage.getItem('bookingContext') || '{}');
+    if (!ctx.stationId) {
+      sessionStorage.removeItem('bookingContext');
+      window.location.href = 'booking.html';
     }
-    if (payMethod === 'net' && !selectedBank) { showToast('Please select a bank', 'error'); return false; }
-    return true;
-  }
 
-  // ── Process payment ────────────────────────────────
-  async function doPayment() {
-    if (!validate()) return;
+    // Populate summary
+    document.getElementById('sum-station').textContent = ctx.stationName || '—';
+    const dateSlot = (ctx.date || '—') + (ctx.slot ? ' · ' + ctx.slot : '');
+    document.getElementById('sum-slot').textContent = dateSlot;
+    document.getElementById('sum-charger').textContent = ctx.charger || '—';
 
-    const btn = document.getElementById('pay-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Processing…';
+    const base = Number(ctx.price) || 0;
+    const gst = Math.round(base * 0.18);
+    const fee = 5;
+    const total = base + gst + fee;
+    document.getElementById('sum-base').textContent = '₹' + base;
+    document.getElementById('sum-gst').textContent = '₹' + gst;
+    document.getElementById('sum-total').textContent = '₹' + total;
 
-    try {
-      // Build start/end time safely
-      const dateStr = ctx.date;
-      const slotStr = ctx.slot || '10:00';
+    // ── Payment method ─────────────────────────────────
+    let payMethod = 'upi';
+    let selectedBank = '';
 
-      // Normalise slot to 24h HH:MM
-      let hhmm = slotStr.trim();
-      if (/am|pm/i.test(hhmm)) {
-        const d = new Date('1970-01-01 ' + hhmm);
-        hhmm = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-      } else {
-        hhmm = hhmm.substring(0, 5);
+    function selectPay(m) {
+      payMethod = m;
+      document.querySelectorAll('.pay-opt').forEach(el => el.classList.remove('selected'));
+      document.getElementById('opt-' + m).classList.add('selected');
+      document.getElementById('upi-panel').classList.toggle('open', m === 'upi');
+      document.getElementById('card-panel').classList.toggle('open', m === 'card');
+      document.getElementById('wallet-panel').classList.toggle('open', m === 'wallet');
+      document.getElementById('net-panel').classList.toggle('open', m === 'net');
+    }
+
+    function selectBank(el, bank) {
+      selectedBank = bank;
+      document.querySelectorAll('.bank-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function fmtCard(input) {
+      let v = input.value.replace(/\D/g, '').substring(0, 16);
+      input.value = v.replace(/(.{4})/g, '$1 ').trim();
+    }
+
+    // ── Validate ─────────────────────────
+    function validate() {
+      if (payMethod === 'card') {
+        const num = document.getElementById('card-num').value.replace(/\s/g, '');
+        const exp = document.getElementById('card-exp').value;
+        const cvv = document.getElementById('card-cvv').value;
+        if (num.length < 16) { showToast('Enter a valid 16-digit card number', 'error'); return false; }
+        if (!/^\d{2}\/\d{2}$/.test(exp)) { showToast('Enter expiry as MM/YY', 'error'); return false; }
+        if (cvv.length < 3) { showToast('Enter a valid CVV', 'error'); return false; }
       }
+      if (payMethod === 'net' && !selectedBank) { showToast('Please select a bank', 'error'); return false; }
+      return true;
+    }
 
-      const startISO = new Date(`${dateStr}T${hhmm}:00`).toISOString();
-      const endDate  = new Date(`${dateStr}T${hhmm}:00`);
-      endDate.setHours(endDate.getHours() + (ctx.duration || 1));
-      const endISO = endDate.toISOString();
+    // ── Process payment ────────────────────────────────
+    async function doPayment() {
+      if (!validate()) return;
 
-      const txnId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
+      const btn = document.getElementById('pay-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Processing…';
 
-      // Valid MongoDB ObjectId = 24 hex chars
-      const isDbStation = ctx.stationId && /^[a-f\d]{24}$/i.test(String(ctx.stationId));
+      try {
+        const dateStr = ctx.date;
+        const slotStr = ctx.slot || '10:00';
 
-      let resolvedStationId = ctx.stationId;
+        let hhmm = slotStr.trim();
+        if (/am|pm/i.test(hhmm)) {
+          const d = new Date('1970-01-01 ' + hhmm);
+          hhmm = d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+        } else {
+          hhmm = hhmm.substring(0, 5);
+        }
 
-      // If NOT a DB station, find-or-create it in the database first
-      if (!isDbStation) {
-        try {
-          const stationRes = await apiCall('/stations/find-or-create', {
+        const startISO = new Date(`${dateStr}T${hhmm}:00`).toISOString();
+        const endDate = new Date(`${dateStr}T${hhmm}:00`);
+        endDate.setHours(endDate.getHours() + (ctx.duration || 1));
+        const endISO = endDate.toISOString();
+
+        const txnId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
+
+        const isDbStation = ctx.stationId && /^[a-f\d]{24}$/i.test(String(ctx.stationId));
+        let resolvedStationId = ctx.stationId;
+
+        if (!isDbStation) {
+          try {
+            const stationRes = await apiCall('/stations/find-or-create', {
+              method: 'POST',
+              body: JSON.stringify({
+                name: ctx.stationName || 'EV Station',
+                address: ctx.stationAddr || 'Live Station',
+                latitude: ctx.latitude || 0,
+                longitude: ctx.longitude || 0,
+                pricePerHour: Number(ctx.price) || 8,
+                chargingSpeed: 'fast',
+                source: 'live'
+              })
+            });
+            resolvedStationId = stationRes.station?._id || stationRes.station?.id;
+          } catch (e) {
+            console.warn('[Payment] Could not create station record:', e.message);
+          }
+        }
+
+        let bookingId = 'BK' + Date.now();
+
+        if (resolvedStationId && /^[a-f\d]{24}$/i.test(String(resolvedStationId))) {
+          const bookRes = await apiCall('/bookings', {
             method: 'POST',
             body: JSON.stringify({
-              name: ctx.stationName || 'EV Station',
-              address: ctx.stationAddr || 'Live Station',
-              latitude: ctx.latitude || 0,
-              longitude: ctx.longitude || 0,
-              pricePerHour: Number(ctx.price) || 8,
-              chargingSpeed: 'fast',
-              source: 'live'
+              station: resolvedStationId,
+              slot: ctx.slotId || null,
+              startTime: startISO,
+              endTime: endISO,
+              duration: ctx.duration || 1,
+              vehicleType: ctx.vehicleType || 'car',
+              chargerType: ctx.charger || 'CCS'
             })
           });
-          resolvedStationId = stationRes.station?._id || stationRes.station?.id;
-        } catch (e) {
-          console.warn('[Payment] Could not create station record:', e.message);
+          bookingId = bookRes.booking?._id || bookRes._id || bookingId;
+
+          await apiCall('/payments', {
+            method: 'POST',
+            body: JSON.stringify({
+              booking: bookingId,
+              amount: total,
+              paymentMethod: payMethod,
+              transactionId: txnId,
+              bankName: selectedBank || undefined
+            })
+          });
+        } else {
+          await new Promise(r => setTimeout(r, 1200));
         }
+
+        const currentUserId = user._id || user.id || user.email || 'guest';
+        sessionStorage.setItem('confirmationData', JSON.stringify({
+          bookingId,
+          txnId,
+          userId: currentUserId,
+          stationId: resolvedStationId || ctx.stationId,
+          stationName: ctx.stationName || 'EV Charging Station',
+          stationAddr: ctx.stationAddr || '',
+          date: ctx.date,
+          slot: ctx.slot,
+          charger: ctx.charger,
+          duration: ctx.duration || 1,
+          amount: total,
+          payMethod,
+          userName: user.name,
+          userEmail: user.email
+        }));
+
+        window.location.href = 'confirmation.html';
+
+      } catch (err) {
+        console.error('[Payment]', err);
+        showToast(err.message || 'Payment failed. Please try again.', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> PAY NOW';
       }
-
-      let bookingId = 'BK' + Date.now(); // fallback only
-
-      // Create booking + payment via API (for ALL stations now)
-      if (resolvedStationId && /^[a-f\d]{24}$/i.test(String(resolvedStationId))) {
-        const bookRes = await apiCall('/bookings', {
-          method: 'POST',
-          body: JSON.stringify({
-            station:     resolvedStationId,
-            slot:        ctx.slotId || null,
-            startTime:   startISO,
-            endTime:     endISO,
-            duration:    ctx.duration || 1,
-            vehicleType: ctx.vehicleType || 'car',
-            chargerType: ctx.charger || 'CCS'
-          })
-        });
-        bookingId = bookRes.booking?._id || bookRes._id || bookingId;
-
-        await apiCall('/payments', {
-          method: 'POST',
-          body: JSON.stringify({
-            booking:       bookingId,
-            amount:        total,
-            paymentMethod: payMethod,
-            transactionId: txnId,
-            bankName:      selectedBank || undefined
-          })
-        });
-      } else {
-        // Absolute fallback: simulate short delay
-        await new Promise(r => setTimeout(r, 1200));
-      }
-
-      // Save confirmation context — tagged with userId to prevent cross-user bleed
-      const currentUserId = user._id || user.id || user.email || 'guest';
-      sessionStorage.setItem('confirmationData', JSON.stringify({
-        bookingId,
-        txnId,
-        userId:      currentUserId,
-        stationId:   resolvedStationId || ctx.stationId,
-        stationName: ctx.stationName  || 'EV Charging Station',
-        stationAddr: ctx.stationAddr  || '',
-        date:        ctx.date,
-        slot:        ctx.slot,
-        charger:     ctx.charger,
-        duration:    ctx.duration || 1,
-        amount:      total,
-        payMethod,
-        userName:    user.name,
-        userEmail:   user.email
-      }));
-
-      window.location.href = 'confirmation.html';
-
-    } catch (err) {
-      console.error('[Payment]', err);
-      showToast(err.message || 'Payment failed. Please try again.', 'error');
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-lock"></i> PAY NOW';
     }
-  }
 
-</script>
+  </script>
 </body>
+
 </html>

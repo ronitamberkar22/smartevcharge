@@ -12,7 +12,7 @@
     h3,h4{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
 
     /* ── Grid layout ──────────────────────── */
-    #page{display:grid;grid-template-columns:180px 1fr 360px;grid-template-rows:54px 1fr;width:100vw;height:100vh;}
+    #page{display:grid;grid-template-columns:240px 1fr 360px;grid-template-rows:54px 1fr;width:100vw;height:100vh;}
 
     /* Sidebar */
     #sidebar{grid-column:1;grid-row:1/3;background:#0d0d1a;border-right:1px solid rgba(0,245,160,.1);display:flex;flex-direction:column;overflow:hidden;}
@@ -138,26 +138,36 @@
 </head>
 <body>
 <div id="page">
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div class="sb-logo"><div class="sb-logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="sb-logo-sub">Charging Portal</div></div>
-    <div class="sb-user">
-      <div class="sb-av" id="user-av">U</div>
-      <div><div class="sb-uname" id="user-name">User</div><div class="sb-role"><span class="sb-online"></span>Connected</div></div>
+  <aside id="sidebar">
+    <div style="padding:20px 18px 16px; border-bottom:1px solid rgba(0,245,160,.12);">
+      <div style="font-size:19px; color:#00f5a0; letter-spacing:2px; display:flex; align-items:center; gap:8px; font-family:'Rajdhani',sans-serif;"><i class="fas fa-bolt"></i> SmartEV</div>
+      <div style="font-size:9px; color:#5a5a72; letter-spacing:3px; text-transform:uppercase; margin-top:2px;">Charging Portal</div>
+    </div>
+    <div style="padding:14px 18px; border-bottom:1px solid rgba(0,245,160,.12); display:flex; align-items:center; gap:10px;">
+      <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#00f5a0,#00d4ff); display:flex; align-items:center; justify-content:center; font-family:'Rajdhani',sans-serif; font-size:14px; font-weight:700; color:#0a0a0f;" id="user-avatar-disp">U</div>
+      <div>
+        <div style="font-size:13px; font-weight:600;" id="user-name-disp">User</div>
+        <div style="font-size:10px; color:#00f5a0;">EV user</div>
+      </div>
     </div>
     <nav class="sb-nav">
       <div class="sb-sec">Main</div>
-      <a class="sb-item" href="dashboard.html"><i class="fas fa-th-large"></i> My Dashboard</a>
+      <a class="sb-item" href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a>
       <a class="sb-item active" href="stations.html"><i class="fas fa-charging-station"></i> Find Station</a>
       <div class="sb-sec">Booking</div>
       <a class="sb-item" href="station-detail.html"><i class="fas fa-info-circle"></i> Station Details</a>
       <a class="sb-item" href="booking.html"><i class="fas fa-calendar-plus"></i> Book Slot</a>
       <a class="sb-item" href="payment.html"><i class="fas fa-credit-card"></i> Payment</a>
+      <a class="sb-item" href="confirmation.html"><i class="fas fa-check-circle"></i> Confirmation</a>
       <div class="sb-sec">Account</div>
-      <a class="sb-item" href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a class="sb-item" href="profile.html"><i class="fas fa-user"></i> Profile &amp; History</a>
+      <div class="sb-sec">More</div>
+      <a class="sb-item" href="about.html"><i class="fas fa-circle-info"></i> About Us</a>
     </nav>
-    <div class="sb-bot"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Sign Out</button></div>
-  </div>
+    <div class="sb-bot">
+      <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </aside>
 
   <!-- TOPBAR -->
   <div id="topbar">
@@ -225,8 +235,8 @@
 <script>
 if (!requireUserAuth()) throw new Error('Not authenticated');
 const usr = getUser();
-document.getElementById('user-name').textContent = usr.name || 'User';
-document.getElementById('user-av').textContent = (usr.name||'U').charAt(0).toUpperCase();
+document.getElementById('user-name-disp').textContent = usr.name || 'User';
+document.getElementById('user-avatar-disp').textContent = (usr.name||'U').charAt(0).toUpperCase();
 document.getElementById('logout-btn').onclick = ()=>{ localStorage.clear(); window.location.href='login.html'; };
 
 // State
@@ -448,9 +458,11 @@ function renderList(stations){
     const type=s.hasFast?'⚡ Fast':s.maxKW>=7?'⚡ Standard':'🔌 Slow';
     const dist=s.distKm!=null?s.distKm.toFixed(1)+' km':'';
     const statusDot=s.operational?(avail>0?'g':'o'):'r';
-    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(s.id)}`:`id=${s._id}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${total}&wait=${wait}`;
-    const bookUrl=`booking.html?stationId=${s._id||''}&stationName=${encodeURIComponent(s.name)}`;
-    return `<div class="st-card" id="sc-${esc(s.id)}" onclick="pickStation('${esc(s.id)}',${s.lat},${s.lng})">
+    let sid = s.id || s._id;
+    if (!sid || sid === 'undefined' || sid === 'null') sid = 'gen-' + s.name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(sid)}`:`id=${s._id||sid}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${total}&wait=${wait}`;
+    const bookUrl=`booking.html?stationId=${sid}&stationName=${encodeURIComponent(s.name)}&lat=${s.lat||''}&lng=${s.lng||''}&addr=${encodeURIComponent(s.address||'')}`;
+    return `<div class="st-card" id="sc-${esc(sid)}" onclick="pickStation('${esc(sid)}',${s.lat},${s.lng})">
       <div class="st-card-top">
         <div class="st-dot-row">
           <div class="st-status-dot ${statusDot}"></div>
@@ -495,10 +507,12 @@ function plotMarkers(stations){
         </div>
       </div>`
     });
-    const rating=simRating(s.id);
-    const price=s.pricePerHour||simPrice(s.maxKW,s.id);
-    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(s.id)}`:`id=${s._id}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${s.numPoints}`;
-    const bookHtml=s.ocm?'':`<a href="booking.html?stationId=${s._id}&stationName=${encodeURIComponent(s.name)}" style="display:inline-block;padding:3px 8px;background:linear-gradient(135deg,#00f5a0,#00c896);border-radius:5px;color:#0a0a0f;font-size:10px;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;margin-left:4px;">Book</a>`;
+    const sid = s.id || s._id;
+    const safeSid = (!sid || sid === 'undefined' || sid === 'null') ? ('gen-' + s.name.toLowerCase().replace(/[^a-z0-9]/g, '-')) : sid;
+    const rating=simRating(safeSid);
+    const price=s.pricePerHour||simPrice(s.maxKW,safeSid);
+    const bookHtml=s.ocm?'':`<a href="booking.html?stationId=${safeSid}&stationName=${encodeURIComponent(s.name)}&lat=${s.lat||''}&lng=${s.lng||''}&addr=${encodeURIComponent(s.address||'')}" style="display:inline-block;padding:3px 8px;background:linear-gradient(135deg,#00f5a0,#00c896);border-radius:5px;color:#0a0a0f;font-size:10px;font-weight:700;font-family:'Rajdhani',sans-serif;text-decoration:none;margin-left:4px;">Book</a>`;
+    const detailUrl=`station-detail.html?${s.ocm?`ocmId=${encodeURIComponent(safeSid)}`:`id=${s._id||safeSid}`}&name=${encodeURIComponent(s.name)}&addr=${encodeURIComponent(s.address||'')}&lat=${s.lat}&lng=${s.lng}&kw=${s.maxKW||0}&fast=${s.hasFast?1:0}&src=${s.ocm?'ocm':'db'}&rating=${rating}&price=${price}&avail=${avail}&total=${s.numPoints}`;
     const m=L.marker([s.lat,s.lng],{icon}).bindPopup(`
       <div style="font-family:'Inter',sans-serif;min-width:200px;">
         <div style="font-weight:700;font-size:13px;color:${c};margin-bottom:3px;">${esc(s.name)}</div>

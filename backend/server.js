@@ -38,6 +38,7 @@ app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/slots', require('./routes/slots'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/send-email', require('./routes/email'));
+app.use('/api/reviews', require('./routes/reviews'));
 
 // OpenChargeMap proxy
 app.get('/api/ocm/stations', async (req, res) => {
