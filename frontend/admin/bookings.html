@@ -7,63 +7,135 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <style>
-    :root{--bg:#09090f;--bg2:#10101a;--card:#15151f;--card2:#1a1a28;--accent:#a855f7;--accent2:#7c3aed;--blue:#3b82f6;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--cyan:#06b6d4;--text:#f1f0f7;--text2:#9090b0;--muted:#5a5a72;--border:rgba(168,85,247,0.14);--border2:rgba(168,85,247,0.25);--sidebar:240px;--glow:0 0 24px rgba(168,85,247,0.25);}
-    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}h1,h2,h3{font-family:'Rajdhani',sans-serif;}a{text-decoration:none;color:inherit;}
-    .sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;}
-    .sidebar-logo{padding:20px 18px 16px;border-bottom:1px solid var(--border);}
-    .logo-txt{font-size:19px;color:var(--accent);letter-spacing:2px;display:flex;align-items:center;gap:8px;}
-    .logo-sub{font-size:9px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
-    .sidebar-admin{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-    .admin-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-    .admin-name{font-size:13px;font-weight:600;}.admin-role{font-size:10px;color:var(--accent);display:flex;align-items:center;gap:4px;}
-    .admin-role::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-    .nav{flex:1;padding:10px 0;overflow-y:auto;}.nav-sec{padding:8px 18px 4px;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;color:var(--text2);font-size:13px;font-weight:500;transition:.18s;border-left:3px solid transparent;}
-    .nav-item:hover{color:var(--text);background:rgba(168,85,247,0.06);}
-    .nav-item.active{color:var(--accent);background:rgba(168,85,247,0.1);border-left-color:var(--accent);}
-    .nav-item i{width:16px;text-align:center;font-size:13px;}
-    .sidebar-bottom{padding:14px 18px;border-top:1px solid var(--border);}
-    .btn-logout{width:100%;padding:9px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:8px;color:var(--red);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
-    .btn-logout:hover{background:rgba(239,68,68,0.2);}
-    .main{margin-left:var(--sidebar);display:flex;flex-direction:column;min-height:100vh;}
-    .topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
-    .topbar-left h3{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;}
-    .topbar-left p{font-size:11px;color:var(--text2);margin-top:2px;}
-    .content{padding:24px 28px;}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
-    .search-input{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 14px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;width:240px;}
-    .search-input:focus{border-color:var(--accent);}
-    .filter-sel{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;}
-    .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
-    .tbl{width:100%;border-collapse:collapse;font-size:12.5px;}
-    .tbl th{text-align:left;padding:11px 14px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase;background:var(--card2);border-bottom:1px solid var(--border);white-space:nowrap;}
-    .tbl td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle;}
-    .tbl tr:last-child td{border-bottom:none;}.tbl tr:hover td{background:rgba(168,85,247,0.04);}
-    .pill{padding:3px 10px;border-radius:10px;font-size:10px;font-weight:600;display:inline-block;}
-    .pill.completed{background:rgba(16,185,129,0.15);color:var(--green);}.pill.pending{background:rgba(245,158,11,0.15);color:var(--orange);}
-    .pill.cancelled{background:rgba(239,68,68,0.15);color:var(--red);}.pill.confirmed{background:rgba(6,182,212,0.15);color:var(--cyan);}
-    .pill.in-progress{background:rgba(168,85,247,0.15);color:var(--accent);}
-    .act-btn{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;border:1px solid;display:inline-flex;align-items:center;gap:3px;margin-right:4px;}
-    .act-btn.approve{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--green);}
-    .act-btn.blue{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--blue);}
-    .act-btn.del{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--red);}
-    .empty{text-align:center;padding:40px;color:var(--muted);}
-    .empty i{font-size:30px;margin-bottom:10px;display:block;opacity:.4;}
-    .toast{position:fixed;bottom:24px;right:24px;background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:10px;font-size:13px;z-index:9999;transform:translateX(240%);transition:.35s cubic-bezier(.34,1.56,.64,1);}
-    .toast.show{transform:translateX(0);}
-    .stat-row{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
-    .mini-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:120px;}
-    .mini-stat .val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;}
-    .mini-stat .lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+    :root {
+      --bg: #09090f;
+      --bg2: #10101a;
+      --card: #15151f;
+      --card2: #1a1a28;
+      --accent: #8b31e4;
+      --accent2: #6613f4;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --orange: #f59e0b;
+      --text: #f1f0f7;
+      --text2: #9090b0;
+      --muted: #5a5a72;
+      --border: rgba(168, 85, 247, 0.14);
+      --sidebar: 220px;
+      --glow: 0 0 24px rgba(168, 85, 247, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+    h1, h2, h3 { font-family: 'Rajdhani', sans-serif; }
+    a { text-decoration: none; color: inherit; }
+
+    /* Sidebar - Restored to original design */
+    .sidebar { width: var(--sidebar); background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+    .sidebar-logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+    .logo-txt { font-size: 19px; color: var(--accent); letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+    .logo-sub { font-size: 9px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
+    .sidebar-admin { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .admin-name { font-size: 13px; font-weight: 600; }
+    .admin-role { font-size: 10px; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+    .admin-role::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .nav { flex: 1; padding: 10px 0; overflow-y: auto; }
+    .nav-sec { padding: 8px 18px 4px; font-size: 9px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; color: var(--text2); font-size: 13px; font-weight: 500; transition: .18s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: var(--text); background: rgba(168, 85, 247, 0.06); }
+    .nav-item.active { color: var(--accent); background: rgba(168, 85, 247, 0.1); border-left-color: var(--accent); }
+    .nav-item i { width: 16px; text-align: center; font-size: 13px; }
+    .sidebar-bottom { padding: 14px 18px; border-top: 1px solid var(--border); }
+    .btn-logout { width: 100%; padding: 9px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; color: var(--red); font-size: 12px; cursor: pointer; transition: .2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+    /* Main Content */
+    .main { margin-left: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; }
+    .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-left h3 { font-size: 20px; font-weight: 700; }
+    .topbar-left p { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .top-badge { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 5px 12px; font-size: 11px; color: var(--green); display: flex; align-items: center; gap: 5px; }
+    .top-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    
+    .content { padding: 24px 28px; flex: 1; }
+    
+    /* Layout Alignment Fixes */
+    .action-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .action-group { display: flex; align-items: center; gap: 10px; }
+    
+    .btn-primary { background: var(--accent); color: #fff; border: none; padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: .2s; box-shadow: 0 4px 12px rgba(139, 49, 228, 0.2); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139, 49, 228, 0.3); }
+    .btn-secondary { background: var(--card); border: 1px solid var(--border); padding: 10px 16px; border-radius: 9px; color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 8px; }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+    .search-container { flex: 1; min-width: 300px; position: relative; }
+    .search-container i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+    .search-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px 11px 40px; color: var(--text); font-size: 13px; outline: none; transition: .2s; }
+    .search-input:focus { border-color: var(--accent); }
+
+    .filter-sel { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; color: var(--text); font-size: 13px; outline: none; cursor: pointer; }
+
+    /* Table Fixes */
+    .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow-x: auto; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .tbl th { text-align: left; padding: 14px 18px; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); background: var(--card2); }
+    .tbl td { padding: 14px 18px; border-bottom: 1px solid rgba(255, 255, 255, .03); vertical-align: middle; white-space: nowrap; }
+    .tbl tr:hover td { background: rgba(139, 49, 228, 0.04); }
+    
+    .booking-id { color: var(--accent); font-weight: 600; white-space: nowrap; min-width: 150px; }
+    .amt-cell { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; color: var(--green); }
+    
+    .pill { padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; display: inline-block; text-transform: capitalize; }
+    .pill.completed { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .pill.pending { background: rgba(245, 158, 11, 0.15); color: var(--orange); }
+    .pill.cancelled { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+    .pill.confirmed, .pill.active { background: rgba(6, 182, 212, 0.15); color: var(--cyan); }
+    .pill.in-progress { background: rgba(139, 49, 228, 0.15); color: var(--accent); }
+
+    .actions-cell { display: flex; gap: 8px; }
+    .act-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; transition: .2s; }
+    .act-btn.edit { color: var(--blue); background: rgba(59, 130, 246, 0.1); }
+    .act-btn.edit:hover { background: var(--blue); color: #fff; }
+    .act-btn.cancel { color: var(--orange); background: rgba(245, 158, 11, 0.1); }
+    .act-btn.cancel:hover { background: var(--orange); color: #fff; }
+    .act-btn.delete { color: var(--red); background: rgba(239, 68, 68, 0.1); }
+    .act-btn.delete:hover { background: var(--red); color: #fff; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card2); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 600px; overflow: hidden; animation: modalIn .3s ease-out; }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .modal-header h3 { font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .modal-header h3 i { color: var(--accent); }
+    .modal-body { padding: 24px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .form-control { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 13px; outline: none; }
+    .form-control:focus { border-color: var(--accent); }
+    .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+    
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--card2); border: 1px solid var(--border); border-radius: 12px; padding: 12px 20px; display: none; align-items: center; gap: 10px; font-size: 13px; z-index: 1100; box-shadow: var(--glow); }
+    .toast.show { display: flex; }
   </style>
 </head>
 <body>
-<div style="display:flex;min-height:100vh;">
+
   <aside class="sidebar">
-    <div class="sidebar-logo"><div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div><div class="logo-sub">Admin Panel</div></div>
+    <div class="sidebar-logo">
+      <div class="logo-txt"><i class="fas fa-bolt"></i> SmartEV</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
     <div class="sidebar-admin">
       <div class="admin-avatar" id="admin-avatar">A</div>
-      <div><div class="admin-name" id="admin-name">Admin</div><div class="admin-role">Administrator</div></div>
+      <div>
+        <div class="admin-name" id="admin-name">Admin</div>
+        <div class="admin-role">Administrator</div>
+      </div>
     </div>
     <nav class="nav">
       <div class="nav-sec">Overview</div>
@@ -77,183 +149,294 @@
       <a class="nav-item" href="reports.html"><i class="fas fa-file-export"></i> Reports</a>
       <a class="nav-item" href="settings.html"><i class="fas fa-cog"></i> Settings</a>
     </nav>
-    <div class="sidebar-bottom"><button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button></div>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <div class="topbar-left"><h3>Manage Bookings</h3><p>View, confirm, and manage all user bookings</p></div>
-    </div>
-    <div class="content">
-      <!-- Stats row -->
-      <div class="stat-row" id="booking-stats">
-        <div class="mini-stat"><div class="val" id="s-total">0</div><div class="lbl">Total Bookings</div></div>
-        <div class="mini-stat"><div class="val" style="color:var(--orange);" id="s-pending">0</div><div class="lbl">Pending</div></div>
-        <div class="mini-stat"><div class="val" style="color:var(--cyan);" id="s-confirmed">0</div><div class="lbl">Confirmed</div></div>
-        <div class="mini-stat"><div class="val" style="color:var(--accent);" id="s-progress">0</div><div class="lbl">In Progress</div></div>
-        <div class="mini-stat"><div class="val" style="color:var(--green);" id="s-completed">0</div><div class="lbl">Completed</div></div>
-        <div class="mini-stat"><div class="val" style="color:var(--green);" id="s-revenue">₹0</div><div class="lbl">Total Revenue</div></div>
+      <div class="topbar-left">
+        <h3>Booking Management</h3>
+        <p>Approve, cancel, edit and delete all slot bookings</p>
       </div>
+      <div class="topbar-right">
+        <div class="top-badge">System Online</div>
+        <button class="icon-btn btn-secondary" style="padding: 10px;" onclick="loadBookings()"><i class="fas fa-rotate"></i></button>
+      </div>
+    </div>
 
-      <div class="toolbar">
-        <input type="text" class="search-input" id="search-input" placeholder="Search user or station…" oninput="filterTable()">
+    <div class="content">
+      <div class="action-bar">
+        <div class="action-group">
+          <button class="btn-secondary"><i class="fas fa-sync"></i> Sync Live</button>
+          <button class="btn-secondary"><i class="fas fa-file-export"></i> Export CSV</button>
+          <button class="btn-primary"><i class="fas fa-plus"></i> Add Booking</button>
+        </div>
+        <div class="search-container">
+          <i class="fas fa-search"></i>
+          <input type="text" class="search-input" id="search-input" placeholder="Search by ID, user, station..." oninput="filterTable()">
+        </div>
         <select class="filter-sel" id="status-filter" onchange="filterTable()">
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="in-progress">In Progress</option>
+          <option value="">All Bookings</option>
+          <option value="active">Active</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
         </select>
-        <button onclick="loadBookings()" style="padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text2);cursor:pointer;font-size:12px;"><i class="fas fa-refresh"></i> Refresh</button>
       </div>
+
       <div class="table-wrap">
         <table class="tbl">
-          <thead><tr>
-            <th>User</th>
-            <th>Station</th>
-            <th>Date & Slot</th>
-            <th>Vehicle</th>
-            <th>Amount</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr></thead>
-          <tbody id="bookings-body"><tr><td colspan="7" class="empty"><i class="fas fa-spinner fa-spin"></i>Loading…</td></tr></tbody>
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>User</th>
+              <th>Email</th>
+              <th>Station</th>
+              <th>Date</th>
+              <th>Slot</th>
+              <th>Charger</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="bookings-body">
+            <tr><td colspan="10" style="text-align:center;padding:60px;color:var(--muted);"><i class="fas fa-spinner fa-spin"></i> Loading bookings...</td></tr>
+          </tbody>
         </table>
       </div>
     </div>
   </main>
-</div>
 
-<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toast-msg"></span></div>
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-pen"></i> Edit Booking</h3>
+        <i class="fas fa-times" style="cursor:pointer;color:var(--muted);" onclick="closeModal()"></i>
+      </div>
+      <div class="modal-body">
+        <form class="form-grid" id="edit-form">
+          <div class="form-group">
+            <label>Booking ID</label>
+            <input type="text" class="form-control" id="m-id" disabled>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="m-status">
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="in-progress">In-Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>User Name</label>
+            <input type="text" class="form-control" id="m-user">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" id="m-email">
+          </div>
+          <div class="form-group">
+            <label>Station</label>
+            <input type="text" class="form-control" id="m-station">
+          </div>
+          <div class="form-group">
+            <label>Charger Type</label>
+            <select class="form-control" id="m-charger">
+              <option value="AC 7.7kW">AC 7.7kW</option>
+              <option value="DC 50kW">DC 50kW</option>
+              <option value="DC 150kW">DC 150kW</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" class="form-control" id="m-date">
+          </div>
+          <div class="form-group">
+            <label>Time Slot</label>
+            <input type="text" class="form-control" id="m-slot">
+          </div>
+          <div class="form-group">
+            <label>Amount (₹)</label>
+            <input type="number" class="form-control" id="m-amount">
+          </div>
+          <div class="form-group">
+            <label>Payment Method</label>
+            <select class="form-control" id="m-pay">
+              <option value="UPI">UPI</option>
+              <option value="Card">Card</option>
+              <option value="Wallet">Wallet</option>
+              <option value="Net Banking">Net Banking</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" style="background:#d03d3d;margin-right:auto;box-shadow:none;" onclick="cancelFromModal()"><i class="fas fa-ban"></i> Cancel Booking</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveChanges()"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+    </div>
+  </div>
 
-<script src="/shared/api.js"></script>
-<script>
-  const adminToken = localStorage.getItem('adminToken');
-  const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
-  if (!adminToken || adminUser.role !== 'admin') window.location.href = 'login.html';
-  document.getElementById('admin-name').textContent = adminUser.name || 'Admin';
-  document.getElementById('admin-avatar').textContent = (adminUser.name || 'A').charAt(0).toUpperCase();
-  document.getElementById('logout-btn').addEventListener('click', () => { localStorage.removeItem('adminToken'); localStorage.removeItem('adminUser'); window.location.href='login.html'; });
+  <div class="toast" id="toast">
+    <i id="toast-icon"></i>
+    <span id="toast-msg"></span>
+  </div>
 
-  function showToast(msg, type = 'success') {
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').textContent = msg;
-    t.querySelector('i').className = type === 'error' ? 'fas fa-circle-xmark' : 'fas fa-circle-check';
-    t.querySelector('i').style.color = type === 'error' ? 'var(--red)' : 'var(--green)';
-    t.className = 'toast show';
-    clearTimeout(t._t);
-    t._t = setTimeout(() => t.className = 'toast', 3000);
-  }
+  <script>
+    const adminToken = localStorage.getItem('adminToken');
+    const adminUser = JSON.parse(localStorage.getItem('adminUser') || '{}');
+    if (!adminToken || adminUser.role !== 'admin') window.location.href = 'login.html';
+    
+    document.getElementById('admin-name').textContent = adminUser.name || 'Admin';
+    document.getElementById('admin-avatar').textContent = (adminUser.name || 'A').charAt(0).toUpperCase();
 
-  function adminApiCall(ep, opts = {}) {
-    return fetch('http://localhost:3000/api' + ep, { ...opts, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken, ...opts.headers } }).then(r => r.json());
-  }
+    document.getElementById('logout-btn').onclick = () => {
+      localStorage.removeItem('adminToken'); localStorage.removeItem('adminUser'); window.location.href = 'login.html';
+    };
 
-  let allBookings = [];
+    let allBookings = [];
+    let currentEditId = null;
 
-  function filterTable() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    const s = document.getElementById('status-filter').value;
-    const filtered = allBookings.filter(b => {
-      const match = (b.user?.name || '').toLowerCase().includes(q) || (b.user?.email || '').toLowerCase().includes(q) || (b.station?.name || '').toLowerCase().includes(q);
-      const statusMatch = !s || b.status === s;
-      return match && statusMatch;
-    });
-    renderBookings(filtered);
-  }
+    async function loadBookings() {
+      try {
+        const res = await fetch('http://localhost:3000/api/bookings', {
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        const data = await res.json();
+        allBookings = data.bookings || [];
+        renderTable(allBookings);
+      } catch (err) { showToast('Failed to load bookings', 'error'); }
+    }
 
-  function renderBookings(bookings) {
-    const tbody = document.getElementById('bookings-body');
-    if (!bookings.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><i class="fas fa-calendar-xmark"></i>No bookings found</div></td></tr>'; return; }
-
-    const sorted = [...bookings].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    tbody.innerHTML = sorted.map(b => {
-      const userName = b.user?.name || 'Unknown User';
-      const userEmail = b.user?.email || '';
-      const userInitial = (userName || 'U').charAt(0).toUpperCase();
-      const stationName = b.station?.name || 'N/A';
-      const stationAddr = b.station?.address || '';
-      const dateStr = fmtDateTime(b.startTime || b.createdAt);
-      const duration = b.duration ? (b.duration + 'h') : '—';
-      const charger = b.chargerType || b.station?.chargingSpeed || '';
-      const vehicleNum = b.vehicleNumber || '';
-      const vehicleType = b.vehicleType || 'car';
-      const amount = b.totalAmount != null ? '₹' + b.totalAmount : '—';
-      const status = b.status || 'pending';
-
-      let actions = '';
-      if (status === 'pending') {
-        actions = `<button class="act-btn approve" onclick="confirmBooking('${b._id}')"><i class="fas fa-check"></i> Confirm</button>
-                   <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
-      } else if (status === 'confirmed') {
-        actions = `<button class="act-btn blue" onclick="startCharging('${b._id}')"><i class="fas fa-play"></i> Start</button>
-                   <button class="act-btn del" onclick="cancelBooking('${b._id}')"><i class="fas fa-times"></i></button>`;
-      } else if (status === 'in-progress') {
-        actions = `<button class="act-btn approve" onclick="completeCharging('${b._id}')"><i class="fas fa-flag-checkered"></i> Complete</button>`;
-      } else {
-        actions = '<span style="color:var(--muted);font-size:11px;">—</span>';
+    function renderTable(data) {
+      const tbody = document.getElementById('bookings-body');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:60px;color:var(--muted);">No bookings found</td></tr>';
+        return;
       }
 
-      return `<tr>
-        <td>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--blue));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">${userInitial}</div>
-            <div>
-              <div style="font-weight:600;font-size:12.5px;">${userName}</div>
-              <div style="font-size:10px;color:var(--muted);">${userEmail}</div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div style="font-weight:500;font-size:12px;">${stationName}</div>
-          ${stationAddr ? `<div style="font-size:10px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${stationAddr}</div>` : ''}
-        </td>
-        <td style="font-size:11px;">
-          <div>${dateStr}</div>
-          <div style="font-size:10px;color:var(--muted);">${duration}${charger ? ' · ' + charger : ''}</div>
-        </td>
-        <td style="font-size:11px;">
-          <div>${vehicleNum || vehicleType}</div>
-          ${vehicleNum ? `<div style="font-size:10px;color:var(--muted);text-transform:capitalize;"><i class="fas fa-${vehicleType === 'bike' || vehicleType === 'scooter' ? 'motorcycle' : 'car'}" style="font-size:9px;margin-right:2px;"></i>${vehicleType}</div>` : ''}
-        </td>
-        <td style="color:var(--green);font-weight:600;">${amount}</td>
-        <td><span class="pill ${status}">${status}</span></td>
-        <td style="white-space:nowrap;">${actions}</td>
-      </tr>`;
-    }).join('');
-  }
+      tbody.innerHTML = data.map(b => {
+        const id = b._id ? b._id.substring(b._id.length - 8).toUpperCase() : '00000000';
+        const date = b.startTime ? new Date(b.startTime).toLocaleDateString('en-CA') : 'N/A';
+        const slot = b.startTime ? new Date(b.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : 'N/A';
+        const type = b.chargerType || (b.station && b.station.chargingSpeed === 'fast' ? 'DC 50kW' : 'AC 7.7kW');
+        
+        return `
+          <tr>
+            <td class="booking-id">SEC-2026-${id}</td>
+            <td style="font-weight:600;color:var(--text);">${b.user?.name || 'Guest'}</td>
+            <td style="font-size:11px;opacity:0.6;">${b.user?.email || 'N/A'}</td>
+            <td>${b.station?.name || 'Station'}</td>
+            <td>${date}</td>
+            <td>${slot}</td>
+            <td>${type}</td>
+            <td class="amt-cell">₹${b.totalAmount || 0}</td>
+            <td><span class="pill ${b.status}">${b.status}</span></td>
+            <td>
+              <div class="actions-cell">
+                <div class="act-btn edit" onclick="openEditModal('${b._id}')"><i class="fas fa-pen"></i></div>
+                <div class="act-btn cancel" onclick="cancelBooking('${b._id}')"><i class="fas fa-ban"></i></div>
+                <div class="act-btn delete" onclick="deleteBooking('${b._id}')"><i class="fas fa-trash"></i></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
 
-  async function loadBookings() {
-    try {
-      const data = await adminApiCall('/bookings');
-      allBookings = data.bookings || [];
-      // Update stats
-      document.getElementById('s-total').textContent = allBookings.length;
-      document.getElementById('s-pending').textContent = allBookings.filter(b => b.status === 'pending').length;
-      document.getElementById('s-confirmed').textContent = allBookings.filter(b => b.status === 'confirmed').length;
-      document.getElementById('s-progress').textContent = allBookings.filter(b => b.status === 'in-progress').length;
-      document.getElementById('s-completed').textContent = allBookings.filter(b => b.status === 'completed').length;
-      document.getElementById('s-revenue').textContent = '₹' + allBookings.reduce((s, b) => s + (b.totalAmount || 0), 0);
-      filterTable();
-    } catch(e) { document.getElementById('bookings-body').innerHTML = '<tr><td colspan="7"><div class="empty"><i class="fas fa-exclamation-triangle"></i>Failed to load</div></td></tr>'; }
-  }
+    function filterTable() {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      const s = document.getElementById('status-filter').value;
+      const filtered = allBookings.filter(b => {
+        const match = (b.user?.name || '').toLowerCase().includes(q) || (b.station?.name || '').toLowerCase().includes(q) || (b._id || '').toLowerCase().includes(q);
+        const statusMatch = !s || (s === 'active' ? (b.status === 'confirmed' || b.status === 'in-progress') : b.status === s);
+        return match && statusMatch;
+      });
+      renderTable(filtered);
+    }
 
-  async function confirmBooking(id) {
-    try { await adminApiCall(`/bookings/${id}/confirm`, { method: 'PUT' }); showToast('Booking confirmed!'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
-  }
-  async function startCharging(id) {
-    try { await adminApiCall(`/bookings/${id}/start`, { method: 'PUT' }); showToast('Charging started!'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
-  }
-  async function completeCharging(id) {
-    try { await adminApiCall(`/bookings/${id}/complete`, { method: 'PUT' }); showToast('Charging completed!'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
-  }
-  async function cancelBooking(id) {
-    if (!confirm('Cancel this booking?')) return;
-    try { await adminApiCall(`/bookings/${id}/cancel`, { method: 'PUT' }); showToast('Booking cancelled'); loadBookings(); } catch(e) { showToast(e.message, 'error'); }
-  }
+    function openEditModal(id) {
+      currentEditId = id;
+      const b = allBookings.find(x => x._id === id);
+      if (!b) return;
 
-  loadBookings();
-</script>
+      document.getElementById('m-id').value = `SEC-2026-${id.substring(id.length - 8).toUpperCase()}`;
+      document.getElementById('m-status').value = b.status;
+      document.getElementById('m-user').value = b.user?.name || '';
+      document.getElementById('m-email').value = b.user?.email || '';
+      document.getElementById('m-station').value = b.station?.name || '';
+      document.getElementById('m-charger').value = b.chargerType || 'AC 7.7kW';
+      document.getElementById('m-date').value = b.startTime ? new Date(b.startTime).toLocaleDateString('en-CA') : '';
+      document.getElementById('m-slot').value = b.startTime ? new Date(b.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+      document.getElementById('m-amount').value = b.totalAmount || 0;
+      document.getElementById('m-pay').value = 'UPI';
+
+      document.getElementById('edit-modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('edit-modal').classList.remove('open');
+      currentEditId = null;
+    }
+
+    async function saveChanges() {
+      if (!currentEditId) return;
+      const updates = {
+        status: document.getElementById('m-status').value,
+        chargerType: document.getElementById('m-charger').value,
+        totalAmount: Number(document.getElementById('m-amount').value)
+      };
+      try {
+        const res = await fetch(`http://localhost:3000/api/bookings/${currentEditId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+          body: JSON.stringify(updates)
+        });
+        if (res.ok) { showToast('Booking updated'); closeModal(); loadBookings(); }
+      } catch (e) { showToast('Update failed', 'error'); }
+    }
+
+    async function cancelBooking(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        const res = await fetch(`http://localhost:3000/api/bookings/${id}/cancel`, {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        if (res.ok) { showToast('Booking cancelled'); loadBookings(); }
+      } catch (e) { showToast('Action failed', 'error'); }
+    }
+
+    async function deleteBooking(id) {
+      if (!confirm('Delete this record?')) return;
+      try {
+        const res = await fetch(`http://localhost:3000/api/bookings/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + adminToken }
+        });
+        if (res.ok) { showToast('Booking deleted'); loadBookings(); }
+      } catch (e) { showToast('Action failed', 'error'); }
+    }
+
+    function cancelFromModal() { if (currentEditId) { cancelBooking(currentEditId); closeModal(); } }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      const icon = document.getElementById('toast-icon');
+      icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+      icon.style.color = type === 'error' ? 'var(--red)' : 'var(--green)';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    loadBookings();
+  </script>
 </body>
 </html>

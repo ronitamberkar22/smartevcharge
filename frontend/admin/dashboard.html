@@ -26,7 +26,7 @@
       --muted: #5a5a72;
       --border: rgba(168, 85, 247, 0.14);
       --border2: rgba(168, 85, 247, 0.25);
-      --sidebar: 240px;
+      --sidebar: 220px;
       --glow: 0 0 24px rgba(168, 85, 247, 0.25);
     }
 
@@ -246,8 +246,8 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><h3>Booking Status Distribution</h3></div>
-            <div style="height:260px;position:relative;"><canvas id="statusChart"></canvas></div>
+            <div class="card-header"><h3>Charger Type Distribution</h3></div>
+            <div style="height:260px;position:relative;"><canvas id="chargerChart"></canvas></div>
           </div>
         </div>
       </div>
@@ -405,23 +405,43 @@
       });
     }
 
-    function buildStatusChart(bookings) {
-      const ctx = document.getElementById('statusChart').getContext('2d');
+    function buildChargerChart(bookings) {
+      const ctx = document.getElementById('chargerChart').getContext('2d');
       if (statusChartInstance) statusChartInstance.destroy();
 
-      const statusMap = {};
-      bookings.forEach(b => { statusMap[b.status] = (statusMap[b.status] || 0) + 1; });
-      const labels = Object.keys(statusMap);
-      const data = Object.values(statusMap);
+      const typeMap = { 'AC 7.7kW': 0, 'DC 50kW': 0, 'DC 150kW': 0 };
+      bookings.forEach(b => {
+        // Try all possible sources for charger type
+        let rawType = b.chargerType || 
+                      (b.station && b.station.chargingSpeed) || 
+                      'AC 7.7kW';
+        
+        rawType = String(rawType).toLowerCase();
+        let finalType = 'AC 7.7kW'; // default
+
+        if (rawType.includes('150') || rawType.includes('super-fast')) {
+          finalType = 'DC 150kW';
+        } else if (rawType.includes('50') || rawType.includes('fast')) {
+          finalType = 'DC 50kW';
+        } else if (rawType.includes('7.7') || rawType.includes('7.2') || rawType.includes('slow') || rawType.includes('ac')) {
+          finalType = 'AC 7.7kW';
+        }
+
+        typeMap[finalType]++;
+      });
+
+      const labels = Object.keys(typeMap);
+      const data = Object.values(typeMap);
       const colors = {
-        pending: '#f59e0b', confirmed: '#06b6d4', 'in-progress': '#8b31e4',
-        completed: '#10b981', cancelled: '#ef4444'
+        'AC 7.7kW': '#3b82f6',
+        'DC 50kW': '#8b31e4',
+        'DC 150kW': '#10b981'
       };
 
       statusChartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels.map(l => l.charAt(0).toUpperCase() + l.slice(1)),
+          labels: labels,
           datasets: [{
             data,
             backgroundColor: labels.map(l => colors[l] || '#6b7280'),
@@ -637,9 +657,9 @@
         buildBookingChart(bookings);
         buildRevenueChart(payments);
         if (bookings.length) {
-          buildStatusChart(bookings);
+          buildChargerChart(bookings);
         } else {
-          document.getElementById('statusChart').parentElement.innerHTML = '<div class="empty" style="padding:60px 20px;"><i class="fas fa-chart-pie"></i>No booking data for chart</div>';
+          document.getElementById('chargerChart').parentElement.innerHTML = '<div class="empty" style="padding:60px 20px;"><i class="fas fa-chart-pie"></i>No booking data for chart</div>';
         }
 
         // ── Recent Bookings Table ──

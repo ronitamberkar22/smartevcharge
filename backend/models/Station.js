@@ -12,6 +12,14 @@ const stationSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  cityArea: {
+    type: String,
+    trim: true
+  },
+  operator: {
+    type: String,
+    trim: true
+  },
   latitude: {
     type: Number,
     required: true
@@ -34,6 +42,10 @@ const stationSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
+  priceAC: { type: Number, default: 8 },
+  priceDC: { type: Number, default: 12 },
+  priceSuperFast: { type: Number, default: 18 },
+  openingHours: { type: String, default: 'Open 24/7' },
   chargingSpeed: {
     type: String,
     enum: ['slow', 'fast', 'super-fast'],

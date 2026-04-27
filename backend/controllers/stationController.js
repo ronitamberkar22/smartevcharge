@@ -5,24 +5,8 @@ const Slot = require('../models/Slot');
 // Get all stations (public)
 exports.getAllStations = async (req, res) => {
   try {
-    const { status, search, lat, lng, radius } = req.query;
-    
-    let query = {};
-    
-    if (status) {
-      query.status = status;
-    } else {
-      query.status = 'active';
-    }
-    
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { address: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    const stations = await Station.find(query).sort({ createdAt: -1 });
+    const stations = await Station.find({}).sort({ createdAt: -1 });
+    console.log(`[API] Returning ${stations.length} stations`);
     res.json({ stations });
   } catch (error) {
     res.status(500).json({ message: 'Server error.', error: error.message });

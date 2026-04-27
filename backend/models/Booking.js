@@ -51,6 +51,10 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  chargerType: {
+    type: String,
+    trim: true
+  },
   createdAt: {
     type: Date,
     default: Date.now

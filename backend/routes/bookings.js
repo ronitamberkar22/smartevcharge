@@ -15,5 +15,7 @@ router.put('/:id/start', auth, bookingController.startCharging);
 router.get('/', adminAuth, bookingController.getAllBookings);
 router.put('/:id/confirm', adminAuth, bookingController.confirmBooking);
 router.put('/:id/complete', adminAuth, bookingController.completeCharging);
+router.put('/:id', adminAuth, bookingController.updateBooking);
+router.delete('/:id', adminAuth, bookingController.deleteBooking);
 
 module.exports = router;

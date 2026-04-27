@@ -195,8 +195,8 @@
 
     /* ── Main ─────────────────────────────────────── */
     .main {
-      margin-left: 240px;
-      width: calc(100% - 240px);
+      margin-left: var(--sidebar-w);
+      width: calc(100% - var(--sidebar-w));
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -233,9 +233,11 @@
     }
 
     .content {
-      padding: 24px 28px;
+      padding: 32px 40px;
       flex: 1;
       width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     /* ── Cards ────────────────────────────────────── */
@@ -594,7 +596,7 @@
           <div class="card-title">Select Date & Charger Type</div>
           <div class="date-charger-row">
             <div class="charger-grid" id="charger-grid">
-              <button class="charger-btn active" onclick="selectCharger(this,'AC 7.2kW')">⚡ AC 7.2kW — ₹<span class="ch-price">8</span>/kWh</button>
+              <button class="charger-btn active" onclick="selectCharger(this,'AC 7.7kW')">⚡ AC 7.7kW — ₹<span class="ch-price">8</span>/kWh</button>
               <button class="charger-btn" onclick="selectCharger(this,'DC 50kW')">⚡⚡ DC 50kW — ₹<span class="ch-price">12</span>/kWh</button>
               <button class="charger-btn" onclick="selectCharger(this,'DC 150kW')">⚡⚡⚡ DC 150kW — ₹<span class="ch-price">18</span>/kWh</button>
             </div>
@@ -657,7 +659,7 @@
     let state = {
       stationId: '', stationName: '—', stationAddr: '',
       lat: '', lng: '',
-      charger: 'AC 7.2kW', priceAC: 8, priceDC: 12, priceDCH: 18,
+      charger: 'AC 7.7kW', priceAC: 8, priceDC: 12, priceDCH: 18,
       slot: '', date: ''
     };
 

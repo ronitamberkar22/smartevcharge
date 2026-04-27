@@ -56,6 +56,7 @@ exports.createBooking = async (req, res) => {
       vehicleType: vehicleType || 'car',
       vehicleNumber,
       notes,
+      chargerType: chargerType || 'AC 7.7kW',
       status: 'confirmed'
     });
 
@@ -263,6 +264,28 @@ exports.confirmBooking = async (req, res) => {
     await booking.save();
 
     res.json({ message: 'Booking confirmed.', booking });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+exports.updateBooking = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Booking not found.' });
+    Object.assign(booking, req.body);
+    booking.updatedAt = Date.now();
+    await booking.save();
+    res.json({ message: 'Booking updated.', booking });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+};
+
+exports.deleteBooking = async (req, res) => {
+  try {
+    await Booking.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Booking deleted.' });
   } catch (error) {
     res.status(500).json({ message: 'Server error.', error: error.message });
   }
